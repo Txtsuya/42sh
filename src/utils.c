@@ -71,7 +71,7 @@ static int handle_parent_process(char *path_cmd, char **args,
     int status;
 
     waitpid(child_pid, &status, 0);
-    free(path_cmd);
+    my_free(path_cmd);
     free_array(env_array);
     free_array(args);
     return seg_exit(status);
@@ -115,5 +115,7 @@ int main_loop(minishel_t **llenv, char **env)
         get_input(&input, status, llenv);
         status = execute_multi_cmd(llenv, input);
     }
+    free(input);
+    free_all();
     return status;
 }

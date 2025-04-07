@@ -15,7 +15,7 @@ static int is_two_dote(char c)
 static char *base_path(char *cmd)
 {
     const char *path = "/bin/";
-    char *path_cmd = malloc(my_strlen(path) + my_strlen(cmd));
+    char *path_cmd = my_malloc(my_strlen(path) + my_strlen(cmd));
 
     my_strcpy(path_cmd, path);
     my_strcat(path_cmd, cmd);
@@ -50,13 +50,13 @@ char *build_path_cmd(char *cmd, minishel_t **env)
         return base_path(cmd);
     path_env = my_str_to_word_array(path, is_two_dote);
     while (path_env[i] != NULL) {
-        path_cmd = malloc(my_strlen(path_env[i]) + my_strlen(path) + 1);
+        path_cmd = my_malloc(my_strlen(path_env[i]) + my_strlen(path) + 1);
         my_strcpy(path_cmd, path_env[i]);
         my_strcat(path_cmd, "/");
         my_strcat(path_cmd, cmd);
         if (access(path_cmd, X_OK) == 0)
             return free_and_return(path_cmd, path_env);
-        free(path_cmd);
+        my_free(path_cmd);
         i++;
     }
     return NULL;
@@ -73,10 +73,10 @@ void env_array_to_env_ll(char **env, minishel_t **head)
     }
     for (int i = 0; env[i] != NULL; i++) {
         len_name = my_strlen_c(env[i], '=');
-        name = malloc(sizeof(char) * (len_name + 1));
+        name = my_malloc(sizeof(char) * (len_name + 1));
         my_strncpy(name, env[i], len_name);
         add_llist(head, name, env[i] + len_name + 1);
-        free(name);
+        my_free(name);
     }
 }
 
@@ -93,7 +93,7 @@ static int sizell(minishel_t *head)
 
 char **ll_to_array_env(minishel_t *head)
 {
-    char **env_tab = malloc(sizeof(char *) * (sizell(head) + 1));
+    char **env_tab = my_malloc(sizeof(char *) * (sizell(head) + 1));
     char *tmp;
     int len = 0;
     int i = 0;
@@ -102,7 +102,7 @@ char **ll_to_array_env(minishel_t *head)
         len = my_strlen(head->name) + 2;
         if (head->value != NULL)
             len += my_strlen(head->value);
-        tmp = malloc(sizeof(char) * (len));
+        tmp = my_malloc(sizeof(char) * (len));
         my_strcpy(tmp, head->name);
         my_strcat(tmp, "=");
         if (head->value != NULL)
@@ -123,9 +123,9 @@ static int delete_first_node(minishel_t **head, char *name)
         return 0;
     tmp = *head;
     *head = (*head)->next;
-    free(tmp->name);
-    free(tmp->value);
-    free(tmp);
+    my_free(tmp->name);
+    my_free(tmp->value);
+    my_free(tmp);
     return 1;
 }
 
@@ -146,9 +146,9 @@ int delete_llist(minishel_t **head, char *name)
     }
     if (curr) {
         prev->next = curr->next;
-        free(curr->name);
-        free(curr->value);
-        free(curr);
+        my_free(curr->name);
+        my_free(curr->value);
+        my_free(curr);
     }
     return 1;
 }

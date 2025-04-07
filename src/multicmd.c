@@ -21,9 +21,9 @@ int get_redirection_index(const char *arg)
 void free_array(char **tab)
 {
     for (int i = 0; tab[i] != NULL; i++) {
-        free(tab[i]);
+        my_free(tab[i]);
     }
-    free(tab);
+    my_free(tab);
 }
 
 int execute_multi_cmd(minishel_t **llenv, char *input)
@@ -40,6 +40,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
             status = execute_main_cmd(token, llenv);
         token = strtok_r(NULL, ";", &ptr);
     }
+    free(input);
     return status;
 }
 

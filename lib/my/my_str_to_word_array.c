@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "../../include/my_malloc.h"
 
 int is_alphanumeric(char c)
 {
@@ -52,7 +53,7 @@ static void get_word(char *array, char const *str, int i, int len)
 char **my_str_to_word_array(char const *str, int (*func_cmp)(char))
 {
     int word_count = count_words(str, func_cmp);
-    char **array = malloc(sizeof(char *) * (word_count + 1));
+    char **array = my_malloc(sizeof(char *) * (word_count + 1));
     int len = 0;
     int i = 0;
     int j = 0;
@@ -62,7 +63,7 @@ char **my_str_to_word_array(char const *str, int (*func_cmp)(char))
     while (str[i]) {
         if (func_cmp(str[i])) {
             len = word_l(str, i, func_cmp);
-            array[j] = malloc(sizeof(char) * (len + 1));
+            array[j] = my_malloc(sizeof(char) * (len + 1));
             get_word(array[j], str, i, len);
             j++;
             i += len;
