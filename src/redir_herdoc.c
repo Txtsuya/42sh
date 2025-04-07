@@ -9,7 +9,7 @@
 
 static int *create_heredoc_pipe(void)
 {
-    int *pipe_fd = malloc(2 * sizeof(int));
+    int *pipe_fd = my_malloc(2 * sizeof(int));
 
     if (!pipe_fd) {
         perror("Memory allocation for pipe");
@@ -17,7 +17,7 @@ static int *create_heredoc_pipe(void)
     }
     if (pipe(pipe_fd) == -1) {
         perror("pipe creation");
-        free(pipe_fd);
+        my_free(pipe_fd);
         return NULL;
     }
     return pipe_fd;
@@ -89,7 +89,7 @@ static int process_heredoc_input(const char *delimiter, int pipe_write_fd)
         }
         line_length = read_next_line(&buffer, &buffer_size);
     }
-    free(buffer);
+    my_free(buffer);
     return result;
 }
 
@@ -115,10 +115,10 @@ int redir_heredoc(char *delimiter)
     if (process_heredoc_input(delimiter, pipe_fd[1]) != 0) {
         close(pipe_fd[0]);
         close(pipe_fd[1]);
-        free(pipe_fd);
+        my_free(pipe_fd);
         return 1;
     }
     redirect_result = redirect_stdin_to_pipe(pipe_fd);
-    free(pipe_fd);
+    my_free(pipe_fd);
     return redirect_result;
 }

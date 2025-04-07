@@ -6,6 +6,7 @@
 */
 
 #include "../../include/my.h"
+#include "../../include/my_malloc.h"
 #include <stdlib.h>
 
 char *int_to_str_zero(void)
@@ -28,7 +29,7 @@ char *int_to_str(int num)
         length++;
         temp /= 10;
     }
-    str = malloc((length + 1) * sizeof(char));
+    str = my_malloc((length + 1) * sizeof(char));
     str[length] = '\0';
     i = length - 1;
     while (num > 0) {

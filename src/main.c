@@ -40,7 +40,7 @@ int seg_exit(int status)
 
 void add_llist(minishel_t **head, const char *name, char *value)
 {
-    minishel_t *new = malloc(sizeof(minishel_t));
+    minishel_t *new = my_malloc(sizeof(minishel_t));
     minishel_t *temp;
 
     if (replace_in_list(head, name, value))

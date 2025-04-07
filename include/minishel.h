@@ -13,6 +13,7 @@
     #include <unistd.h>
     #include <string.h>
     #include "my.h"
+    #include "my_malloc.h"
     #include <sys/wait.h>
     #include <limits.h>
     #include <errno.h>
