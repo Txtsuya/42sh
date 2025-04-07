@@ -26,14 +26,15 @@ void free_array(char **tab)
     my_free(tab);
 }
 
-
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
     int status;
     char *token;
     char *ptr;
+    char *new = my_strdup(input);
 
-    token = strtok_r(input, ";", &ptr);
+    free(input);
+    token = strtok_r(new, ";", &ptr);
     while (token != NULL) {
         if (nbr_instr(token, '|'))
             status = executepipe(token, llenv);
@@ -41,7 +42,6 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
             status = execute_main_cmd(token, llenv);
         token = strtok_r(NULL, ";", &ptr);
     }
-    free(input);
     return status;
 }
 
