@@ -26,6 +26,40 @@ void free_array(char **tab)
     free(tab);
 }
 
+static int is_parentese(char *input)
+{
+    int count = 0;
+
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (input[i] == '(')
+            return 1;
+    }
+    return 0;
+}
+
+int warp_execution(char *cmd, minishel_t **llenv)
+{
+    if (is_parentese(cmd)) {
+        return handle_parenthese(llenv, cmd);
+    }
+    if (nbr_instr(cmd, '|') > 0) {
+        return executepipe(cmd, llenv);
+    }
+    return execute_main_cmd(cmd, llenv);
+}
+
+int execute_multi_cmd(minishel_t **llenv, char *input)
+{
+    char **all_cmd = string_to_array_with_priority(input);
+    int status = 0;
+
+    for (int i = 0; all_cmd[i] != NULL; i++) {
+        status = warp_execution(all_cmd[i], llenv);
+    }
+    return status;
+}
+
+/*
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
     int status;
@@ -41,7 +75,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
         token = strtok_r(NULL, ";", &ptr);
     }
     return status;
-}
+}*/
 
 int len_array(char **array)
 {

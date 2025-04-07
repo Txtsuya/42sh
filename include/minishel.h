@@ -32,6 +32,7 @@ typedef struct pipeline_s {
     minishel_t **env;
 } pipeline_t;
 
+char **string_to_array_with_priority(char *input);
 void add_llist(minishel_t **head, const char *name, char *value);
 char *my_getenv(minishel_t *head, const char *name);
 char *build_path_cmd(char *cmd, minishel_t **env);
