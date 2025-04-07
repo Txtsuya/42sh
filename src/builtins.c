@@ -122,8 +122,10 @@ int handle_builtin_cmd(char ***arguments,
         return 1;
     if (handle_env_commands(*arguments, llenv))
         return 1;
-    if (my_strcmp(*arguments[0], "exit") == 0)
+    if (my_strcmp(*arguments[0], "exit") == 0) {
+        free_all();
         exit(0);
+    }
     if (my_strcmp(*arguments[0], "cd") == 0)
         return builtin_cd(*arguments, llenv);
     return 0;
