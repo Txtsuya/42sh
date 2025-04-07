@@ -10,6 +10,7 @@
 malloc_t **get_malloc_struct(void)
 {
     static malloc_t *head = NULL;
+
     return &head;
 }
 
@@ -39,7 +40,7 @@ void free_all(void)
 {
     malloc_t **zeub = get_malloc_struct();
     malloc_t *current = *zeub;
-    malloc_t *tmp= NULL;
+    malloc_t *tmp = NULL;
 
     while (current) {
         tmp = current->next;
