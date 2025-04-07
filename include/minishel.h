@@ -25,6 +25,11 @@ typedef struct minishel_s {
     struct minishel_s *next;
 } minishel_t;
 
+typedef struct command_s {
+    char *name;
+    int (*handler)(char **args, minishel_t **llenv);
+} command_t;
+
 typedef struct pipeline_s {
     int pipe1[2];
     int pipe2[2];
@@ -33,6 +38,13 @@ typedef struct pipeline_s {
     minishel_t **env;
 } pipeline_t;
 
+
+int handle_env(char **args, minishel_t **llenv);
+int handle_setenv(char **args, minishel_t **llenv);
+int handle_unsetenv(char **args, minishel_t **llenv);
+int handle_exit(char **args, minishel_t **llenv);
+int handle_cd(char **args, minishel_t **llenv);
+void add_llist_env(char *pwd, minishel_t **llenv, const char *name);
 void add_llist(minishel_t **head, const char *name, char *value);
 char *my_getenv(minishel_t *head, const char *name);
 char *build_path_cmd(char *cmd, minishel_t **env);
@@ -41,7 +53,7 @@ char **ll_to_array_env(minishel_t *head);
 int delete_llist(minishel_t **head, char *name);
 int handle_builtin_cmd(char ***arguments,
     char *input, minishel_t **llenv);
-static int builtin_cd(char **args, minishel_t **llenv);
+int builtin_cd(char **args, minishel_t **llenv);
 int my_setenv(char **args, minishel_t **llenv);
 int handle_env_commands(char **args, minishel_t **llenv);
 void print_env(minishel_t *head);

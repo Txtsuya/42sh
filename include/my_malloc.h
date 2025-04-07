@@ -9,7 +9,7 @@
     #define MY_MALLOC
     #include <stdlib.h>
 
-typedef struct malloc_s{
+typedef struct malloc_s {
     void *ptr;
     struct malloc_s *next;
 } malloc_t;
