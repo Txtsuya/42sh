@@ -26,7 +26,6 @@ void free_array(char **tab)
     my_free(tab);
 }
 
-
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
     int status;
