@@ -35,7 +35,7 @@ char *copy_string_to_array(char *input, char **array, int start, int end)
     return temp;
 }
 
-char **string_to_array_with_priority(char *input)
+char **string_to_array_with_priority(char *input, int (*func)(char))
 {
     int start = 0;
     int level = 0;
@@ -48,7 +48,7 @@ char **string_to_array_with_priority(char *input)
             level++;
         } else if (input[i] == ')') {
             level--;
-        } else if (input[i] == ';' && level == 0) {
+        } else if (func(input[i]) && level == 0) {
             array[index] = copy_string_to_array(input, array, start, i);
             index++;
             start = i + 1;

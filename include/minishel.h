@@ -32,7 +32,18 @@ typedef struct pipeline_s {
     minishel_t **env;
 } pipeline_t;
 
-char **string_to_array_with_priority(char *input);
+typedef struct s_pipe_ctx {
+    int num_of_pipe;
+    int (*pipefd)[2];
+    pid_t *pid;
+    minishel_t **env;
+    char **argv;
+    int read_pipe;
+    int write_pipe;
+} pipe_ctx_t;
+
+int handle_parenthese(minishel_t **llenv, char *input);
+char **string_to_array_with_priority(char *input, int (*func)(char));
 void add_llist(minishel_t **head, const char *name, char *value);
 char *my_getenv(minishel_t *head, const char *name);
 char *build_path_cmd(char *cmd, minishel_t **env);
@@ -48,7 +59,7 @@ void print_env(minishel_t *head);
 void get_input(char **input, int ret_status, minishel_t **llenv);
 void initialize_shell(char **env, minishel_t **llenv);
 int execute_command(char *path_cmd, char **args, minishel_t **llenv);
-int main_loop(minishel_t **llenv, char **env);
+int main_loop(minishel_t **llenv);
 int len_array(char **array);
 int replace_in_list(minishel_t **head, char const *name, char *value);
 int seg_exit(int status);

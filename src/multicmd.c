@@ -7,6 +7,11 @@
 
 #include "../include/minishel.h"
 
+static int is_separator(char c)
+{
+    return (c == ';');
+}
+
 int get_redirection_index(const char *arg)
 {
     const char *redirection_tokens[] = {">", ">>", "<", "<<", NULL};
@@ -50,7 +55,7 @@ int warp_execution(char *cmd, minishel_t **llenv)
 
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
-    char **all_cmd = string_to_array_with_priority(input);
+    char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
 
     for (int i = 0; all_cmd[i] != NULL; i++) {

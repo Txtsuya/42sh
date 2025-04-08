@@ -106,7 +106,7 @@ char *get_path_cmd(char *args, minishel_t **llenv)
     return path_cmd;
 }
 
-int main_loop(minishel_t **llenv, char **env)
+int main_loop(minishel_t **llenv)
 {
     char *input = NULL;
     int status = 0;
