@@ -49,6 +49,8 @@ char **my_concat_glob(char **command, glob_t *glob)
         if (!command)
             exit(84);
         command[n + i] = strdup(match[i]);
+        if (!match[i])
+            exit(84);
     }
     globfree(glob);
     command[n + i] = NULL;
@@ -64,10 +66,8 @@ char **globbing(char **command)
 
     if (!pattern)
         return command;
-    printf("pattern %s\n", pattern);
     r = glob(pattern, GLOB_ERR, NULL, &g_struct);
     if (r == 0) {
-
         return my_concat_glob(command, &g_struct);
     }
     globfree(&g_struct);
