@@ -8,7 +8,8 @@
 NAME	 	=		mysh
 
 
-SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c) $(wildcard ./lib/my_malloc/*.c)
+SRCS		=		$(wildcard src/*.c) \
+					$(wildcard ./lib/my/*.c) $(wildcard ./lib/my_malloc/*.c)
 
 OBJS            =               $(SRCS:.c=.o)
 

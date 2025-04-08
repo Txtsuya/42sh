@@ -57,13 +57,14 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     int status = 0;
     char *token;
     char *ptr;
+    char *new = my_strdup(input);
 
-    token = strtok_r(input, ";", &ptr);
+    free(input);
+    token = strtok_r(new, ";", &ptr);
     while (token != NULL) {
         status = handle_and(token, llenv);
         token = strtok_r(NULL, ";", &ptr);
     }
-    free(input);
     return status;
 }
 
