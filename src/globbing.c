@@ -10,16 +10,6 @@
 #include "minishel.h"
 #include <glob.h>
 
-int len_array(char **array)
-{
-    int i = 0;
-
-    while (array[i] != NULL) {
-        i++;
-    }
-    return i;
-}
-
 char *search_pattern(char **cmd)
 {
     char *delim;
