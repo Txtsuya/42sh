@@ -38,6 +38,7 @@ static int error_command_not_found(char *path_cmd, char *args)
         write(2, ": Command not found.\n", 21);
         exit(1);
     }
+    return 0;
 }
 
 static int execve_error(char *command)
