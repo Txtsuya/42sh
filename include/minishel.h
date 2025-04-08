@@ -78,4 +78,9 @@ int test_valid_pipe(char *token);
 int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
 int check_right_argv(char *argv);
 
+//special variable handling
+void initialize_variable_term(minishel_t **llenv);
+void call_special_variables(minishel_t **llenv);
+void update_special_variables(minishel_t **llenv);
+
 #endif

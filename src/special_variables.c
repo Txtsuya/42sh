@@ -28,8 +28,7 @@ void update_special_variables(minishel_t **llenv)
 {
     char *term_var = my_getenv(*llenv, "TERM");
 
-    if (term_var != NULL) {
+    if (term_var != NULL)
         replace_in_list(llenv, "term", term_var);
-    }
     return;
 }
