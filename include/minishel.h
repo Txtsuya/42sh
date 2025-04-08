@@ -77,5 +77,6 @@ char **remove_redirections(char **args);
 int test_valid_pipe(char *token);
 int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
 int check_right_argv(char *argv);
+char **globbing(char **command);
 
 #endif
