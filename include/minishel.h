@@ -18,6 +18,7 @@
     #include <limits.h>
     #include <errno.h>
     #include <fcntl.h>
+    #include <signal.h>
 
 typedef struct minishel_s {
     char *name;

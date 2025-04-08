@@ -10,6 +10,7 @@
 malloc_t **get_malloc_struct(void)
 {
     static malloc_t *head = NULL;
+
     return &head;
 }
 

@@ -26,19 +26,41 @@ void free_array(char **tab)
     my_free(tab);
 }
 
+int handle_and(char *cmd, minishel_t **llenv)
+{
+    int status = 0;
+    char *tkt_ptr;
+    char *token = strtok_r(cmd, "&&", &tkt_ptr);
+    int len = 0;
+
+    while (token != NULL) {
+        while (*token == ' ')
+            token++;
+        len = my_strlen(token);
+        while (len > 0 && token[len - 1] == ' ') {
+            token[len] = '\0';
+            len--;
+        }
+        if (nbr_instr(token, '|'))
+            status = executepipe(token, llenv);
+        else
+            status = execute_main_cmd(token, llenv);
+        if (status != 0)
+            break;
+        token = strtok_r(NULL, "&&", &tkt_ptr);
+    }
+    return status;
+}
 
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
-    int status;
+    int status = 0;
     char *token;
     char *ptr;
 
     token = strtok_r(input, ";", &ptr);
     while (token != NULL) {
-        if (nbr_instr(token, '|'))
-            status = executepipe(token, llenv);
-        else
-            status = execute_main_cmd(token, llenv);
+        status = handle_and(token, llenv);
         token = strtok_r(NULL, ";", &ptr);
     }
     free(input);
