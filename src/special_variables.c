@@ -23,3 +23,13 @@ void call_special_variables(minishel_t **llenv)
     initialize_variable_term(llenv);
     return;
 }
+
+void update_special_variables(minishel_t **llenv)
+{
+    char *term_var = my_getenv(*llenv, "TERM");
+
+    if (term_var != NULL) {
+        replace_in_list(llenv, "term", term_var);
+    }
+    return;
+}
