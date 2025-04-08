@@ -8,6 +8,7 @@
 #ifndef MY_H
     #define MY_H
     #define ERROR 84
+    #include <stddef.h>
 
 void my_putchar(char c);
 int my_isneg(int nb);

@@ -8,6 +8,7 @@
 #ifndef MINISHEL_H
     #define MINISHEL_H
 
+    #include <stddef.h>
     #include <stdio.h>
     #include <stdlib.h>
     #include <unistd.h>
@@ -18,6 +19,12 @@
     #include <limits.h>
     #include <errno.h>
     #include <fcntl.h>
+
+typedef struct alias_ll {
+    char *name;
+    char **value;
+    struct alias_ll *next;
+} alias_ll_t;
 
 typedef struct minishel_s {
     char *name;
@@ -77,6 +84,12 @@ char **remove_redirections(char **args);
 int test_valid_pipe(char *token);
 int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
 int check_right_argv(char *argv);
+int handle_alias(char **args, minishel_t **llenv);
+void check_alias(char ***args);
+char *extract_between_quotes(const char *str);
+char *my_strchr(const char *str, int c);
+int handle_unalias(char **args, minishel_t **llenv);
+alias_ll_t **get_ll_alias(void);
 char **globbing(char **command);
 
 #endif
