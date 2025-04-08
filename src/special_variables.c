@@ -17,3 +17,9 @@ void initialize_variable_term(minishel_t **llenv)
         add_llist(llenv, "term", "unknown");
     return;
 }
+
+void call_special_variables(minishel_t **llenv)
+{
+    initialize_variable_term(llenv);
+    return;
+}
