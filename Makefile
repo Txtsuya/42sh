@@ -5,7 +5,7 @@
 ## First makefile
 ##
 
-NAME	 	=		mysh
+NAME	 	=		42sh
 
 
 SRCS		=		$(wildcard src/*.c) \
