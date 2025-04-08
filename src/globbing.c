@@ -10,6 +10,16 @@
 #include "minishel.h"
 #include <glob.h>
 
+int len_array(char **array)
+{
+    int i = 0;
+
+    while (array[i] != NULL) {
+        i++;
+    }
+    return i;
+}
+
 char *search_pattern(char **cmd)
 {
     char *delim;
@@ -17,15 +27,32 @@ char *search_pattern(char **cmd)
     for (int i = 0; cmd[i]; i++) {
         delim = strstr(cmd[i], "*");
         if (delim)
-            return delim;
+            return cmd[i];
         delim = strstr(cmd[i], "?");
         if (delim)
-            return delim;
+            return cmd[i];
         delim = strstr(cmd[i], "[");
         if (delim && strstr(cmd[i], "]"))
-            return delim;
+            return cmd[i];
     }
     return NULL;
+}
+
+char **my_concat_glob(char **command, glob_t *glob)
+{
+    char **match = glob->gl_pathv;
+    int n = len_array(command) - 1;
+    int i = 0;
+
+    for (i = 0; match[i]; i++) {
+        command = realloc(command, sizeof(char *) * (n + i + 1));
+        if (!command)
+            exit(84);
+        command[n + i] = strdup(match[i]);
+    }
+    globfree(glob);
+    command[n + i] = NULL;
+    return command;
 }
 
 char **globbing(char **command)
@@ -37,12 +64,12 @@ char **globbing(char **command)
 
     if (!pattern)
         return command;
+    printf("pattern %s\n", pattern);
     r = glob(pattern, GLOB_ERR, NULL, &g_struct);
     if (r == 0) {
-        match = g_struct.gl_pathv;
-        globfree(&g_struct);
-        return match;
+
+        return my_concat_glob(command, &g_struct);
     }
     globfree(&g_struct);
-    return NULL;
+    return command;
 }
