@@ -35,7 +35,9 @@ int seg_exit(int status)
             return 136;
         }
     }
-    return 0;
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    return 1;
 }
 
 void add_llist(minishel_t **head, const char *name, char *value)
