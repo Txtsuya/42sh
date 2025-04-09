@@ -18,6 +18,7 @@
     #include <limits.h>
     #include <errno.h>
     #include <fcntl.h>
+    #include <ctype.h>
 
 typedef struct minishel_s {
     char *name;
@@ -79,8 +80,8 @@ int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
 int check_right_argv(char *argv);
 
 //special variable handling
-void initialize_variable_term(minishel_t **llenv);
-void call_special_variables(minishel_t **llenv);
-void update_special_variables(minishel_t **llenv);
+char *expand_variables(char *input, minishel_t **env);
+char *get_special_variables(minishel_t **env, char *name);
+char *get_variable_name(char *input, int *i);
 
 #endif
