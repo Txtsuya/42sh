@@ -23,7 +23,8 @@ char *get_variable_name(char *input, int *i)
     while (input[pos] != '\0' && (input[pos] == '_' || isalnum(input[pos]))) {
         if (j == 0)
             var = my_malloc(sizeof(char) * (my_strlen(input) + 1));
-        var[j++] = input[pos];
+        var[j] = input[pos];
+        j++;
         pos++;
     }
     *i = pos;
@@ -44,17 +45,21 @@ char *expand_variables(char *input, minishel_t **env)
     int j = 0;
 
     result[0] = '\0';
-    while (input[i] != '\0') {
+    for (i; input[i] != '\0'; i++) {
         if (input[i] == '$') {
             i++;
             var = get_variable_name(input, &i);
             value = get_special_variables(env, var);
-            result = my_strcat(result, value);
-            free(var);
-        } else
-            result[j++] = input[i++];
-            result[j] = '\0';
-        i++;
+            for (int k = 0; value[k] != '\0'; k++) {
+                result[j] = value[k];
+                j++;
+            }
+            my_free(var);
+        } else {
+                result[j] = input[i];
+                j++;
+        }
+        result[j] = '\0';
     }
     return result;
 }
