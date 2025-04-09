@@ -18,9 +18,9 @@ static int is_pipe(char c)
 
 static int is_red_or_operator(char *cmd)
 {
-    char *all_red[] = {"<", "<<", ">", ">>", "&&", NULL};
+    char *all_red[] = {"<", "<<", ">", ">>", "&&", "||", NULL};
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
         if (my_strcmp(all_red[i], cmd) == 0) {
             return i;
         }
@@ -40,16 +40,17 @@ static int count_args_for_parentheses(char *input)
             level++;
         else if (input[i] == ')')
             level--;
-        else if (level == 0 && (input[i] == '|' || input[i] == '>' || input[i] == '<')) {
+        else if (level == 0 && (input[i] == '|' || input[i] == '>' || input[i] == '<') || input[i] == '&') {
             // Séparateur trouvé à niveau 0
             if (has_prev_char)
                 count++;  // Comptez l'argument avant le séparateur
             count++;      // Comptez le séparateur lui-même
             has_prev_char = 0;
-            
             // Gérer les opérateurs à deux caractères (>> et <<)
             if ((input[i] == '>' && input[i+1] == '>') || 
-                (input[i] == '<' && input[i+1] == '<'))
+                (input[i] == '<' && input[i+1] == '<') ||
+                (input[i] == '&' && input[i+1] == '&') ||
+                (input[i] == '|' && input[i+1] == '|'))
                 i++;
         } else if (!is_space(input[i])) {
             has_prev_char = 1;
@@ -103,16 +104,15 @@ char **string_to_array_for_parentheses(char *input)
             level++;
         else if (input[i] == ')')
             level--;
-        else if (level == 0 && (input[i] == '|' || input[i] == '>' || input[i] == '<')) {
-            // Ajouter l'argument avant le séparateur
+        else if (level == 0 && (input[i] == '|' || input[i] == '>' || input[i] == '<' || input[i] == '&')) {
             char *arg = copy_string_for_parentheses(input, start, i);
             if (arg != NULL) {
                 array[index++] = arg;
             }
-            
-            // Ajouter le séparateur
             if ((input[i] == '>' && input[i+1] == '>') || 
-                (input[i] == '<' && input[i+1] == '<')) {
+                (input[i] == '<' && input[i+1] == '<') ||
+                (input[i] == '&' && input[i+1] == '&') ||
+                (input[i] == '|' && input[i+1] == '|')) {
                 array[index] = malloc(3 * sizeof(char));
                 array[index][0] = input[i];
                 array[index][1] = input[i+1];
@@ -165,109 +165,6 @@ char *clean_parenthese_argv(char *cmd)
     strncpy(cleaned_cmd, cmd + 1, len - 2);
     cleaned_cmd[len - 2] = '\0';
     return cleaned_cmd;
-}
-
-static void dup_middle_process(pipe_ctx_t *ctx, int i)
-{
-    if (ctx->pid[i] == 0) {
-        dup2(ctx->pipefd[ctx->read_pipe][0], STDIN_FILENO);
-        dup2(ctx->pipefd[ctx->write_pipe][1], STDOUT_FILENO);
-        close(ctx->pipefd[0][0]);
-        close(ctx->pipefd[0][1]);
-        close(ctx->pipefd[1][0]);
-        close(ctx->pipefd[1][1]);
-        execute_multi_cmd(ctx->env, clean_parenthese_argv(ctx->argv[i + 1]));
-        exit(0);
-    }
-}
-
-static void middle_processes(pipe_ctx_t *ctx)
-{
-    if (ctx->num_of_pipe <= 1)
-        return;
-    for (int i = 1; i < ctx->num_of_pipe; i++) {
-        ctx->read_pipe = (i - 1) % 2;
-        ctx->write_pipe = i % 2;
-        if (i > 1) {
-            close(ctx->pipefd[ctx->write_pipe][0]);
-            close(ctx->pipefd[ctx->write_pipe][1]);
-            pipe(ctx->pipefd[ctx->write_pipe]);
-        }
-        ctx->pid[i] = fork();
-        dup_middle_process(ctx, i);
-        close(ctx->pipefd[ctx->read_pipe][0]);
-        close(ctx->pipefd[ctx->read_pipe][1]);
-        if (i < ctx->num_of_pipe - 1) {
-            pipe(ctx->pipefd[ctx->read_pipe]);
-        }
-    }
-}
-
-static void first_process(pipe_ctx_t *ctx)
-{
-    ctx->pid[0] = fork();
-    if (ctx->pid[0] == 0) {
-        close(ctx->pipefd[0][0]);
-        if (ctx->num_of_pipe > 1) {
-            close(ctx->pipefd[1][0]);
-            close(ctx->pipefd[1][1]);
-        }
-        dup2(ctx->pipefd[0][1], STDOUT_FILENO);
-        close(ctx->pipefd[0][1]);
-        execute_multi_cmd(ctx->env, clean_parenthese_argv(ctx->argv[0]));
-        exit(0);
-    }
-}
-
-static void last_process(pipe_ctx_t *ctx)
-{
-    int last = ctx->num_of_pipe;
-    int last_read_pipe = (last - 1) % 2;
-
-    ctx->pid[last] = fork();
-    if (ctx->pid[last] == 0) {
-        dup2(ctx->pipefd[last_read_pipe][0], STDIN_FILENO);
-        close(ctx->pipefd[0][0]);
-        close(ctx->pipefd[0][1]);
-        if (ctx->num_of_pipe > 1) {
-            close(ctx->pipefd[1][0]);
-            close(ctx->pipefd[1][1]);
-        }
-        execute_multi_cmd(ctx->env, clean_parenthese_argv(ctx->argv[last + 1]));
-        exit(0);
-    }
-}
-
-static int wait_processes(int num_of_pipe, pid_t *pid)
-{
-    int return_value = 0;
-
-    for (int i = 0; i <= num_of_pipe; i++) {
-        if (pid[i] != getpid())
-            waitpid(pid[i], &return_value, 0);
-    }
-    return return_value;
-}
-
-int handle_pipe_in_parenthese(char **all_arg, minishel_t **llenv, int num_sep)
-{
-    int pipefd[2][2];
-    pid_t pid[num_sep + 1];
-    int return_value;
-    pipe_ctx_t ctx = {num_sep, pipefd, pid, llenv, all_arg, 0, 0};
-    int pipes_needed = (num_sep > 1) ? 2 : num_sep;
-
-    for (int i = 0; i < pipes_needed; i++)
-        pipe(pipefd[i]);
-    first_process(&ctx);
-    middle_processes(&ctx);
-    last_process(&ctx);
-    for (int i = 0; i < pipes_needed; i++) {
-        close(pipefd[i][0]);
-        close(pipefd[i][1]);
-    }
-    return_value = wait_processes(num_sep, pid);
-    return return_value;
 }
 
 static int redir_in(char **all_arg, minishel_t **llenv)
@@ -340,22 +237,156 @@ static int redir_dout(char **all_arg, minishel_t **llenv)
 static int and(char **all_arg, minishel_t **llenv)
 {
     int status = 0;
-    char *cleaned_cmd1 = clean_parenthese_argv(all_arg[0]);
-    status = execute_multi_cmd(llenv, cleaned_cmd1);
+    char *cleaned_cmd = clean_parenthese_argv(all_arg[0]);
+    char *all_arg2 = clean_parenthese_argv(all_arg[2]);
+
+    status = execute_multi_cmd(llenv, cleaned_cmd);
     if (status == 0) {
-        status = execute_multi_cmd(llenv, all_arg[2]);
+        status = execute_multi_cmd(llenv, all_arg2);
     }
-    free(cleaned_cmd1);
+    free(cleaned_cmd);
+    return status;
+}
+
+static int or(char **all_arg, minishel_t **llenv)
+{
+    int status = 0;
+    char *cleaned_cmd = clean_parenthese_argv(all_arg[0]);
+    char *cleaned_cmd2 = clean_parenthese_argv(all_arg[2]);
+
+    status = execute_multi_cmd(llenv, cleaned_cmd);
+    if (status != 0) {
+        status = execute_multi_cmd(llenv, cleaned_cmd2);
+    }
+    free(cleaned_cmd);
     return status;
 }
 
 int handle_redirection_in_parenthese(char **all_arg, minishel_t **llenv)
 {
     int (*ptr[])(char **, minishel_t **) =
-        {redir_in, here_doc, redir_out, redir_dout, and};
+        {redir_in, here_doc, redir_out, redir_dout, and, or, NULL};
     int redir_index = is_red_or_operator(all_arg[1]);
 
     return ptr[redir_index](all_arg, llenv);
+}
+
+int handle_is_redirection_after_pipe(minishel_t **llenv, char **all_arg, int i)
+{
+    if (all_arg[i + 1] == NULL) {
+        return execute_main_cmd(clean_parenthese_argv(all_arg[i]), llenv);
+    } else {
+        int redir_index = is_red_or_operator(all_arg[i + 1]);
+        if (redir_index > 1) {
+            return handle_redirection_in_parenthese(all_arg + i, llenv);
+        } else {
+            printf("Ambiguous input redirect.\n");
+        }
+    }
+    return 0;
+}
+
+static void dup_middle_process(pipe_ctx_t *ctx, int i)
+{
+    if (ctx->pid[i] == 0) {
+        dup2(ctx->pipefd[ctx->read_pipe][0], STDIN_FILENO);
+        dup2(ctx->pipefd[ctx->write_pipe][1], STDOUT_FILENO);
+        close(ctx->pipefd[0][0]);
+        close(ctx->pipefd[0][1]);
+        close(ctx->pipefd[1][0]);
+        close(ctx->pipefd[1][1]);
+        execute_multi_cmd(ctx->env, clean_parenthese_argv(ctx->argv[i + 1]));
+        exit(0);
+    }
+}
+
+static void middle_processes(pipe_ctx_t *ctx)
+{
+    if (ctx->num_of_pipe <= 1)
+        return;
+    for (int i = 1; i < ctx->num_of_pipe; i++) {
+        ctx->read_pipe = (i - 1) % 2;
+        ctx->write_pipe = i % 2;
+        if (i > 1) {
+            close(ctx->pipefd[ctx->write_pipe][0]);
+            close(ctx->pipefd[ctx->write_pipe][1]);
+            pipe(ctx->pipefd[ctx->write_pipe]);
+        }
+        ctx->pid[i] = fork();
+        dup_middle_process(ctx, i);
+        close(ctx->pipefd[ctx->read_pipe][0]);
+        close(ctx->pipefd[ctx->read_pipe][1]);
+        if (i < ctx->num_of_pipe - 1) {
+            pipe(ctx->pipefd[ctx->read_pipe]);
+        }
+    }
+}
+
+static void first_process(pipe_ctx_t *ctx)
+{
+    ctx->pid[0] = fork();
+    if (ctx->pid[0] == 0) {
+        close(ctx->pipefd[0][0]);
+        if (ctx->num_of_pipe > 1) {
+            close(ctx->pipefd[1][0]);
+            close(ctx->pipefd[1][1]);
+        }
+        dup2(ctx->pipefd[0][1], STDOUT_FILENO);
+        close(ctx->pipefd[0][1]);
+        execute_multi_cmd(ctx->env, clean_parenthese_argv(ctx->argv[0]));
+        exit(0);
+    }
+}
+
+static void last_process(pipe_ctx_t *ctx)
+{
+    int last = ctx->num_of_pipe;
+    int last_read_pipe = (last - 1) % 2;
+
+    ctx->pid[last] = fork();
+    if (ctx->pid[last] == 0) {
+        dup2(ctx->pipefd[last_read_pipe][0], STDIN_FILENO);
+        close(ctx->pipefd[0][0]);
+        close(ctx->pipefd[0][1]);
+        if (ctx->num_of_pipe > 1) {
+            close(ctx->pipefd[1][0]);
+            close(ctx->pipefd[1][1]);
+        }
+        handle_is_redirection_after_pipe(ctx->env, ctx->argv, last + 1);
+        exit(0);
+    }
+}
+
+static int wait_processes(int num_of_pipe, pid_t *pid)
+{
+    int return_value = 0;
+
+    for (int i = 0; i <= num_of_pipe; i++) {
+        if (pid[i] != getpid())
+            waitpid(pid[i], &return_value, 0);
+    }
+    return return_value;
+}
+
+int handle_pipe_in_parenthese(char **all_arg, minishel_t **llenv, int num_sep)
+{
+    int pipefd[2][2];
+    pid_t pid[num_sep + 1];
+    int return_value;
+    pipe_ctx_t ctx = {num_sep, pipefd, pid, llenv, all_arg, 0, 0};
+    int pipes_needed = (num_sep > 1) ? 2 : num_sep;
+
+    for (int i = 0; i < pipes_needed; i++)
+        pipe(pipefd[i]);
+    first_process(&ctx);
+    middle_processes(&ctx);
+    last_process(&ctx);
+    for (int i = 0; i < pipes_needed; i++) {
+        close(pipefd[i][0]);
+        close(pipefd[i][1]);
+    }
+    return_value = wait_processes(num_sep, pid);
+    return return_value;
 }
 
 int handle_redirection_parenthese(char **all_arg, minishel_t **llenv, int num_of_sep)
@@ -391,7 +422,7 @@ int handle_parenthese(minishel_t **llenv, char *input)
     int arraylen = len_array(all_arg);
 
     if (len_array(all_arg) == 1) {
-        return execute_multi_cmd(llenv, all_arg[0]);
+        return execute_multi_cmd(llenv, clean_parenthese_argv(all_arg[0]));
     } else {
         return handle_redirection_parenthese(all_arg, llenv, num_sep);
     }
