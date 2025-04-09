@@ -35,7 +35,7 @@ char **my_concat_glob(char **command, glob_t *glob)
     int i = 0;
 
     for (i = 0; match[i]; i++) {
-        command = realloc(command, sizeof(char *) * (n + i + 1));
+        command = realloc(command, sizeof(char *) * (n + i + 2));
         if (!command)
             exit(84);
         command[n + i] = strdup(match[i]);
