@@ -52,6 +52,7 @@ int handle_setenv(char **args, minishel_t **llenv);
 int handle_unsetenv(char **args, minishel_t **llenv);
 int handle_exit(char **args, minishel_t **llenv);
 int handle_cd(char **args, minishel_t **llenv);
+int handle_variable(char **args, minishel_t **llenv);
 void add_llist_env(char *pwd, minishel_t **llenv, const char *name);
 void add_llist(minishel_t **head, const char *name, char *value);
 char *my_getenv(minishel_t *head, const char *name);
