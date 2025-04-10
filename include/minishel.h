@@ -42,6 +42,21 @@ typedef struct s_pipe_ctx {
     int write_pipe;
 } pipe_ctx_t;
 
+typedef struct parse_context_s {
+    int index;
+    int start;
+    int level;
+    int i;
+} parse_context_t;
+
+int is_pipe(char c);
+int is_redirection(char c);
+int search_pipe(char *input);
+char **string_to_array_for_parentheses(char *input);
+char *clean_parenthese_argv(char *cmd);
+int is_red_or_operator(char *cmd);
+int handle_redirection_in_parenthese(char **all_arg, minishel_t **llenv);
+int check_error_parenthese(char **all_arg, char *input, int arraylen);
 int handle_parenthese(minishel_t **llenv, char *input);
 char **string_to_array_with_priority(char *input, int (*func)(char));
 void add_llist(minishel_t **head, const char *name, char *value);

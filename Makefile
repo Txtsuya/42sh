@@ -8,12 +8,12 @@
 NAME	 	=		mysh
 
 
-SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c)
+SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c) $(wildcard ./src/parenthese/*.c)
 
 OBJS            =               $(SRCS:.c=.o)
 
 $(NAME)         :               $(OBJS)
-				 	gcc -o $(NAME) $(OBJS) $(CFLAGS)
+				 	gcc -Wall -Wextra -o $(NAME) $(OBJS) $(CFLAGS)
 
 all             :               $(NAME)
 

@@ -64,24 +64,6 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     return status;
 }
 
-/*
-int execute_multi_cmd(minishel_t **llenv, char *input)
-{
-    int status;
-    char *token;
-    char *ptr;
-
-    token = strtok_r(input, ";", &ptr);
-    while (token != NULL) {
-        if (nbr_instr(token, '|'))
-            status = executepipe(token, llenv);
-        else
-            status = execute_main_cmd(token, llenv);
-        token = strtok_r(NULL, ";", &ptr);
-    }
-    return status;
-}*/
-
 int len_array(char **array)
 {
     int i = 0;
