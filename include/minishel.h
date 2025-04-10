@@ -39,7 +39,6 @@ typedef struct pipeline_s {
     minishel_t **env;
 } pipeline_t;
 
-
 int handle_env(char **args, minishel_t **llenv);
 int handle_setenv(char **args, minishel_t **llenv);
 int handle_unsetenv(char **args, minishel_t **llenv);
