@@ -52,7 +52,7 @@ int test_valid_pipe(char *token)
 
     free_args(args);
     if (!is_valid) {
-        printf("a\n");
+        printf("%s: Invalid null command.\n", token);
         write(2, "Invalid null command.\n", 22);
         return 1;
     }

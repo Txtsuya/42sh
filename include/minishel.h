@@ -42,13 +42,15 @@ typedef struct s_pipe_ctx {
     int write_pipe;
 } pipe_ctx_t;
 
-typedef struct parse_context_s {
+typedef struct {
     int index;
     int start;
     int level;
     int i;
-} parse_context_t;
+} parse_ctx_t;
 
+int is_simple_sep(char c);
+int is_double_sep(char *str, int i);
 int is_pipe(char c);
 int is_redirection(char c);
 int search_pipe(char *input);

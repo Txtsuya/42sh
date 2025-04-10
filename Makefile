@@ -8,7 +8,8 @@
 NAME	 	=		mysh
 
 
-SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c) $(wildcard ./src/parenthese/*.c)
+SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c) \
+					$(wildcard src/parentese_sys/*.c)
 
 OBJS            =               $(SRCS:.c=.o)
 

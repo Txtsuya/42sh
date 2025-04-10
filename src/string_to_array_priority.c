@@ -14,9 +14,11 @@ int count_arg(char *input)
     for (int i = 0; input[i] != '\0'; i++) {
         if (input[i] == '(') {
             level++;
-        } else if (input[i] == ')') {
+        }
+        if (input[i] == ')') {
             level--;
-        } else if (input[i] == ';' && level == 0) {
+        }
+        if (input[i] == ';' && level == 0) {
             count++;
         }
     }
@@ -44,11 +46,11 @@ char **string_to_array_with_priority(char *input, int (*func)(char))
     char **array = malloc(sizeof(char *) * (count_word + 1));
 
     for (int i = 0; input[i] != '\0'; i++) {
-        if (input[i] == '(') {
+        if (input[i] == '(')
             level++;
-        } else if (input[i] == ')') {
+        if (input[i] == ')')
             level--;
-        } else if (func(input[i]) && level == 0) {
+        if (func(input[i]) && level == 0) {
             array[index] = copy_string_to_array(input, array, start, i);
             index++;
             start = i + 1;
