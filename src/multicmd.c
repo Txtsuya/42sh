@@ -93,19 +93,29 @@ static void parse_token(char *token)
     }
 }
 
+static int handle_special_cmd(char *token, minishel_t **llenv)
+{
+    int status = 0;
+
+    if (my_strstr(token, "&") != NULL)
+        return jobs_control(token, llenv);
+    if (my_strstr(token, "&&") != NULL)
+        return handle_and(token, llenv);
+    if (my_strstr(token, "||") != NULL)
+        return handle_or(token, llenv);
+    return -1;
+}
+
 int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;
 
-    if (my_strstr(token, "&&") != NULL)
-        status = handle_and(token, llenv);
-    else if (my_strstr(token, "||") != NULL)
-        status = handle_or(token, llenv);
-    else {
-        parse_token(token);
-        status = which_cmd(token, llenv);
-    }
+    status = handle_special_cmd(token, llenv);
+    if (status != -1)
+        return status;
+    parse_token(token);
+    status = which_cmd(token, llenv);
     return status;
 }
 
