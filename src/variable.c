@@ -50,6 +50,7 @@ int handle_variable(char **args, minishel_t **llenv)
         } else {
             add_llist(variable, cut_var[0], NULL);
         }
+        free_array(cut_var);
     }
     return 1;
 }
