@@ -7,16 +7,15 @@
 
 #include "minishel.h"
 
+static int is_equal(char c)
+{
+    return (c != '=');
+}
+
 minishel_t **get_variable(void)
 {
     static minishel_t *variable = NULL;
 
-    if (!variable) {
-        variable = malloc(sizeof(minishel_t *));
-        variable->name = NULL;
-        variable->next = NULL;
-        variable->value = NULL;
-    }
     return &variable;
 }
 
@@ -37,14 +36,20 @@ void print_var(void)
 int handle_variable(char **args, minishel_t **llenv)
 {
     minishel_t **variable = get_variable();
-    int n = len_array(args);
+    int len_args = len_array(args);
+    char **cut_var;
+    int len_cut = 0;
 
-    if (n == 1)
+    if (len_args == 1)
         print_var();
-    else if (n == 2) {
-        add_llist(variable, args[1], args[2]);
-    } else {
-        add_llist(variable, args[1], NULL);
+    else {
+        cut_var = my_str_to_word_array(args[1], is_equal);
+        len_cut = len_array(cut_var);
+        if (len_cut == 2) {
+            add_llist(variable, cut_var[0], cut_var[1]);
+        } else {
+            add_llist(variable, cut_var[0], NULL);
+        }
     }
     return 1;
 }
