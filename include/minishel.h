@@ -46,6 +46,20 @@ typedef struct pipeline_s {
     minishel_t **env;
 } pipeline_t;
 
+typedef enum job_state {
+    JOB_RUNNING,
+    JOB_STOPPED,
+    JOB_DONE
+} job_state_t;
+
+typedef struct job_s {
+    int id;
+    char *command;
+    pid_t pid;
+    job_state_t state;
+    struct job_s *next;
+} job_t;
+
 int jobs_control(char *cmd, minishel_t **llenv);
 int handle_env(char **args, minishel_t **llenv);
 int handle_setenv(char **args, minishel_t **llenv);
