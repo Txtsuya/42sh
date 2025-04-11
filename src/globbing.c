@@ -57,8 +57,11 @@ char **globbing(char **command)
     if (!pattern)
         return command;
     r = glob(pattern, GLOB_ERR, NULL, &g_struct);
-    if (r == 0) {
+    if (r == 0)
         return my_concat_glob(command, &g_struct);
+    else if (r == GLOB_NOMATCH) {
+        fprintf(stderr, "%s: No match.\n", command[0]);
+        return NULL;
     }
     globfree(&g_struct);
     return command;
