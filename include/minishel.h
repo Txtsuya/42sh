@@ -20,6 +20,7 @@
     #include <errno.h>
     #include <fcntl.h>
     #include <signal.h>
+    #include <termios.h>
 
 typedef struct alias_ll {
     char *name;
@@ -60,7 +61,21 @@ typedef struct job_s {
     struct job_s *next;
 } job_t;
 
+void handle_sigchld(int sig);
+int check_stop_status(pid_t child_pid, int status);
+
+void print_jobs(void);
+void update_jobs_status(void);
+void remove_job(int job_id);
+job_t *find_job_by_pid(pid_t pid);
+job_t *find_job_by_id(int job_id);
+job_t *add_job(pid_t pid, char *cmd);
+job_t **get_job_list(void);
+
+int background(char **cmd, minishel_t **env);
+int forground(char **cmd, minishel_t **env);
 int jobs_control(char *cmd, minishel_t **llenv);
+
 int handle_env(char **args, minishel_t **llenv);
 int handle_setenv(char **args, minishel_t **llenv);
 int handle_unsetenv(char **args, minishel_t **llenv);

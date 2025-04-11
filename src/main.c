@@ -62,10 +62,31 @@ void add_llist(minishel_t **head, const char *name, char *value)
     }
 }
 
+static void ignore_signal(void)
+{
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGCHLD, handle_sigchld);
+}
+
+static void init_job(void)
+{
+    int shell_terminal = STDIN_FILENO;
+    struct termios shell_tmodes;
+
+    setpgid(0, 0);
+    ignore_signal();
+    tcgetattr(shell_terminal, &shell_tmodes);
+}
+
 int main(int argc, char **argv, char **env)
 {
     minishel_t *llenv;
 
     initialize_shell(env, &llenv);
+    init_job();
     return main_loop(&llenv, env);
 }

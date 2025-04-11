@@ -34,8 +34,6 @@ static int error_command_not_found(char *path_cmd, char *args)
     if (path_cmd == NULL) {
         my_putstr(args);
         my_putstr(": Command not found.\n");
-        write(2, args, my_strlen(args));
-        write(2, ": Command not found.\n", 21);
         exit(1);
     }
     return 0;
@@ -66,13 +64,26 @@ static int handle_child_process(char *path_cmd, char **args, char **env_array)
     return 0;
 }
 
-static int handle_parent_process(char *path_cmd, char **args,
-    pid_t child_pid, char **env_array)
+static void restore_signal(void)
+{
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    signal(SIGTSTP, SIG_DFL);
+    signal(SIGTTIN, SIG_DFL);
+    signal(SIGTTOU, SIG_DFL);
+}
+
+static int handle_parent_process(char **args,
+    pid_t child_pid, char **env_array, int shell_pid)
 {
     int status;
 
-    waitpid(child_pid, &status, 0);
-    my_free(path_cmd);
+    setpgid(child_pid, child_pid);
+    tcsetpgrp(STDIN_FILENO, child_pid);
+    add_job(child_pid, args[0]);
+    waitpid(child_pid, &status, WUNTRACED);
+    tcsetpgrp(STDIN_FILENO, shell_pid);
+    check_stop_status(child_pid, status);
     free_array(env_array);
     free_array(args);
     return seg_exit(status);
@@ -81,7 +92,9 @@ static int handle_parent_process(char *path_cmd, char **args,
 int execute_command(char *path_cmd, char **args, minishel_t **llenv)
 {
     pid_t pid;
+    int shell_pid = getpid();
     char **env_array;
+    int return_value;
 
     env_array = ll_to_array_env(*llenv);
     pid = fork();
@@ -90,9 +103,13 @@ int execute_command(char *path_cmd, char **args, minishel_t **llenv)
         exit(1);
     }
     if (pid == 0) {
+        restore_signal();
+        setpgid(0, 0);
         return handle_child_process(path_cmd, args, env_array);
     } else {
-        return handle_parent_process(path_cmd, args, pid, env_array);
+        return_value = handle_parent_process(args, pid, env_array, shell_pid);
+        my_free(path_cmd);
+        return return_value;
     }
 }
 
@@ -114,6 +131,7 @@ int main_loop(minishel_t **llenv, char **env)
 
     while (1) {
         get_input(&input, status, llenv);
+        update_jobs_status();
         status = execute_multi_cmd(llenv, input);
     }
     free(input);
