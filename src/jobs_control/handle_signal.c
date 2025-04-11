@@ -27,29 +27,3 @@ int check_stop_status(pid_t child_pid, int status)
     }
     return 0;
 }
-
-void handle_sigchld(int sig)
-{
-    volatile sig_atomic_t got_sigchld = 1;
-    // int status;
-    // pid_t pid;
-    
-    // while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED | WCONTINUED)) > 0) {
-    //     if (WIFEXITED(status) || WIFSIGNALED(status)) {
-    //         job_t *job = find_job_by_pid(pid);
-    //         if (job) {
-    //             if (isatty(STDOUT_FILENO)) {
-    //                 write(STDOUT_FILENO, "\n", 1);
-    //             }
-    //             printf("[%d] %s: Done\n", job->id, job->command);
-    //         }
-    //         remove_job(job->id);
-    //     } else if (WIFSTOPPED(status)) {
-    //         job_t *job = find_job_by_pid(pid);
-    //         if (job) {
-    //             job->state = JOB_STOPPED;
-    //             printf("[%d] %s: Stopped\n", job->id, job->command);
-    //         }
-    //     }
-    // }
-}

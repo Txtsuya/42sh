@@ -21,7 +21,7 @@ int get_input(char **input, int ret_status, minishel_t **llenv)
         my_putstr(" > ");
     }
     sigprocmask(SIG_SETMASK, &old_mask, NULL);
-    if (getline(input, &len, stdin); == -1) {
+    if (getline(input, &len, stdin) == -1) {
         if (feof(stdin))
             return 1;
         return -1;

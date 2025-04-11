@@ -64,12 +64,6 @@ void add_llist(minishel_t **head, const char *name, char *value)
 
 static void ignore_signal(void)
 {
-    struct sigaction sa;
-    
-    sa.sa_handler = handle_sigchld;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    sigaction(SIGCHLD, &sa, NULL);
     signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
