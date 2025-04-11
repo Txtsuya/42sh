@@ -26,9 +26,76 @@ int get_redirection_index(const char *arg)
 void free_array(char **tab)
 {
     for (int i = 0; tab[i] != NULL; i++) {
-        free(tab[i]);
+        my_free(tab[i]);
     }
-    free(tab);
+    my_free(tab);
+}
+
+static int which_cmd(char *cmd, minishel_t **llenv)
+{
+    if (nbr_instr(cmd, '|'))
+        return executepipe(cmd, llenv);
+    else
+        return execute_main_cmd(cmd, llenv);
+}
+
+static int handle_and(char *cmd, minishel_t **llenv)
+{
+    int status = 0;
+    char *tkt_ptr;
+    char *token = strtok_r(cmd, "&&", &tkt_ptr);
+    int len = 0;
+
+    while (token != NULL) {
+        while (*token == ' ')
+            token++;
+        len = my_strlen(token);
+        while (len > 0 && token[len - 1] == ' ') {
+            token[len] = '\0';
+            len--;
+        }
+        status = which_cmd(token, llenv);
+        if (status != 0)
+            break;
+        token = strtok_r(NULL, "&&", &tkt_ptr);
+    }
+    return status;
+}
+
+static int handle_or(char *cmd, minishel_t **llenv)
+{
+    int status = 1;
+    char *tkt_ptr;
+    char *token = strtok_r(cmd, "||", &tkt_ptr);
+    int len = 0;
+
+    while (token != NULL) {
+        while (*token == ' ')
+            token++;
+        len = my_strlen(token);
+        while (len > 0 && token[len - 1] == ' ') {
+            token[len - 1] = '\0';
+            len--;
+        }
+        if (status != 0)
+            status = which_cmd(token, llenv);
+        if (status == 0)
+            break;
+        token = strtok_r(NULL, "||", &tkt_ptr);
+    }
+    return status;
+}
+
+static void parse_token(char *token)
+{
+    int len = my_strlen(token);
+
+    while (*token == ' ')
+        token++;
+    while (len > 0 && token[len - 1] == ' ') {
+        token[len - 1] = '\0';
+        len--;
+    }
 }
 
 static int is_parentese(char *input)
@@ -42,15 +109,23 @@ static int is_parentese(char *input)
     return 0;
 }
 
-int warp_execution(char *cmd, minishel_t **llenv)
+int handle_token(char *token, minishel_t **llenv)
 {
-    if (is_parentese(cmd)) {
-        return handle_parenthese(llenv, cmd);
+    int status = 0;
+    int len = 0;
+
+    if (is_parentese(token)) {
+        return handle_parenthese(llenv, token);
     }
-    if (nbr_instr(cmd, '|') > 0) {
-        return executepipe(cmd, llenv);
+    if (my_strstr(token, "&&") != NULL)
+        status = handle_and(token, llenv);
+    else if (my_strstr(token, "||") != NULL)
+        status = handle_or(token, llenv);
+    else {
+        parse_token(token);
+        status = which_cmd(token, llenv);
     }
-    return execute_main_cmd(cmd, llenv);
+    return status;
 }
 
 int execute_multi_cmd(minishel_t **llenv, char *input)
@@ -59,7 +134,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     int status = 0;
 
     for (int i = 0; all_cmd[i] != NULL; i++) {
-        status = warp_execution(all_cmd[i], llenv);
+        status = handle_token(all_cmd[i], llenv);
     }
     return status;
 }

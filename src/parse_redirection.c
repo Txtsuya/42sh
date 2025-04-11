@@ -89,7 +89,7 @@ void fill_filtered_args(char **args, char **new_args)
 char **remove_redirections(char **args)
 {
     int valid_count = count_valid_args(args);
-    char **new_args = malloc((valid_count + 1) * sizeof(char *));
+    char **new_args = my_malloc((valid_count + 1) * sizeof(char *));
 
     if (!new_args)
         return NULL;

@@ -40,9 +40,9 @@ void free_args(char **args)
     if (!args)
         return;
     for (int i = 0; args[i]; i++) {
-        free(args[i]);
+        my_free(args[i]);
     }
-    free(args);
+    my_free(args);
 }
 
 int test_valid_pipe(char *token)

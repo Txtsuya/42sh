@@ -18,6 +18,7 @@ static int open_parenthese(char input, int *level,
     if (*level > 0) {
         *is_char_between += 1;
     }
+    return 0;
 }
 
 static int check_parenthes(char input, int *level,
@@ -37,6 +38,7 @@ static int check_parenthes(char input, int *level,
             *is_sep = 1;
         }
     }
+    return 0;
 }
 
 int check_num_of_parenthese(char *input)

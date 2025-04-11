@@ -5,6 +5,7 @@
 ** my strdup
 */
 #include "../../include/my.h"
+#include "../../include/my_malloc.h"
 #include <stdlib.h>
 
 char *my_strdup(char const *src)
@@ -13,7 +14,7 @@ char *my_strdup(char const *src)
     char *dest;
     int i = 0;
 
-    dest = malloc(sizeof(char) * len + 1);
+    dest = my_malloc(sizeof(char) * len + 1);
     while (src[i]) {
         dest[i] = src[i];
         i++;

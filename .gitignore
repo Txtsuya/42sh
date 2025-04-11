@@ -1,5 +1,22 @@
+
 a.out
 
 seg.c
 
+42sh
+
+.vscode
+
+*.o
+
 coding-style-reports.log
+
+tester
+
+Stremio.exe
+
+*.gcno
+
+*.gcda
+
+unit_tests

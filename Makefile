@@ -5,13 +5,16 @@
 ## First makefile
 ##
 
-NAME	 	=		mysh
+NAME	 	=		42sh
 
 
 SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c) \
-					$(wildcard src/parentese_sys/*.c)
+					$(wildcard src/parentese_sys/*.c) \
+					$(wildcard ./lib/my_malloc/*.c)
 
-OBJS            =               $(SRCS:.c=.o)
+OBJS        =               $(SRCS:.c=.o)
+
+CFLAGS  	=	-Wall -Wextra -Wno-unused -I ./include
 
 $(NAME)         :               $(OBJS)
 				 	gcc -Wall -Wextra -o $(NAME) $(OBJS) $(CFLAGS)
@@ -40,7 +43,7 @@ clean_test		:
 re              :               fclean all
 
 val		:		$(OBJS)
-			gcc -o $(NAME) $(OBJS) $(CFLAGS) -g3
+			gcc -o $(NAME) $(SRCS) $(CFLAGS) -g3
 
 run 	:		re
 				./$(NAME)
