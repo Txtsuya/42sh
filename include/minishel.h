@@ -95,7 +95,7 @@ int builtin_cd(char **args, minishel_t **llenv);
 int my_setenv(char **args, minishel_t **llenv);
 int handle_env_commands(char **args, minishel_t **llenv);
 void print_env(minishel_t *head);
-void get_input(char **input, int ret_status, minishel_t **llenv);
+int get_input(char **input, int ret_status, minishel_t **llenv);
 void initialize_shell(char **env, minishel_t **llenv);
 int execute_command(char *path_cmd, char **args, minishel_t **llenv);
 int main_loop(minishel_t **llenv, char **env);

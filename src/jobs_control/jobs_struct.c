@@ -83,6 +83,31 @@ void remove_job(int job_id)
     }
 }
 
+void update_jobs_status(void)
+{
+    int status;
+    pid_t pid;
+    
+    while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
+        if (WIFEXITED(status) || WIFSIGNALED(status)) {
+            job_t *job = find_job_by_pid(pid);
+            if (job) {
+                if (isatty(STDOUT_FILENO)) {
+                    write(STDOUT_FILENO, "\n", 1);
+                }
+                printf("[%d] %s: Done\n", job->id, job->command);
+                remove_job(job->id);
+            }
+        } else if (WIFSTOPPED(status)) {
+            job_t *job = find_job_by_pid(pid);
+            if (job) {
+                job->state = JOB_STOPPED;
+                printf("[%d] %s: Stopped\n", job->id, job->command);
+            }
+        }
+    }
+}
+
 void print_jobs(void)
 {
     job_t **jobs = get_job_list();

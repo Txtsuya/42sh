@@ -7,20 +7,29 @@
 
 #include "../include/minishel.h"
 
-void get_input(char **input, int ret_status, minishel_t **llenv)
+int get_input(char **input, int ret_status, minishel_t **llenv)
 {
     size_t len = 0;
+    sigset_t mask;
+    sigset_t old_mask;
 
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGCHLD);
+    sigprocmask(SIG_BLOCK, &mask, &old_mask);
     if (isatty(STDIN_FILENO)) {
         my_putstr(my_getenv(*llenv, "PWD"));
         my_putstr(" > ");
     }
-    if (getline(input, &len, stdin) == -1) {
-        exit(ret_status);
+    sigprocmask(SIG_SETMASK, &old_mask, NULL);
+    if (getline(input, &len, stdin); == -1) {
+        if (feof(stdin))
+            return 1;
+        return -1;
     }
     if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n') {
         (*input)[my_strlen(*input) - 1] = '\0';
     }
+    return 0;
 }
 
 void initialize_shell(char **env, minishel_t **llenv)
@@ -128,9 +137,15 @@ int main_loop(minishel_t **llenv, char **env)
 {
     char *input = NULL;
     int status = 0;
+    int return_value = 0;
 
     while (1) {
-        get_input(&input, status, llenv);
+        update_jobs_status();
+        return_value = get_input(&input, status, llenv);
+        if (return_value == 1)
+            break;
+        if (return_value == -1)
+            continue;
         status = execute_multi_cmd(llenv, input);
     }
     free(input);
