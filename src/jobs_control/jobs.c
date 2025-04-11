@@ -20,9 +20,8 @@ int execute_background(char *cmd, minishel_t **llenv)
         setpgid(0, 0);
         exit(execute_multi_cmd(llenv, cmd));
     } else {
-        printf("[%d] %d\n", pid, getpid());
-        add_job(pid, cmd);
-        setpgid(pid, pid);
+        job_t *job = add_job(pid, cmd);
+        printf("[%d] %d\n", job->id, pid);
     }
     return 0;
 }

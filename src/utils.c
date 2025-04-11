@@ -131,7 +131,6 @@ int main_loop(minishel_t **llenv, char **env)
 
     while (1) {
         get_input(&input, status, llenv);
-        update_jobs_status();
         status = execute_multi_cmd(llenv, input);
     }
     free(input);

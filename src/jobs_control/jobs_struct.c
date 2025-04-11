@@ -83,24 +83,6 @@ void remove_job(int job_id)
     }
 }
 
-void update_jobs_status(void)
-{
-    job_t **jobs = get_job_list();
-    job_t *current = *jobs;
-    job_t *next;
-    int status;
-    
-    while (current) {
-        next = current->next;
-        waitpid(current->pid, &status, WUNTRACED);
-        if (WIFEXITED(status) || WIFSIGNALED(status)) {
-            current->state = JOB_DONE;
-            remove_job(current->id);
-        }
-        current = next;
-    }
-}
-
 void print_jobs(void)
 {
     job_t **jobs = get_job_list();

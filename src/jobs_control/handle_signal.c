@@ -37,14 +37,14 @@ void handle_sigchld(int sig)
         if (WIFEXITED(status) || WIFSIGNALED(status)) {
             job_t *job = find_job_by_pid(pid);
             if (job) {
-                printf("[%d] Done\n", job->id);
+                printf("[%d] %s: Done\n", job->id, job->command);
                 remove_job(job->id);
             }
         } else if (WIFSTOPPED(status)) {
             job_t *job = find_job_by_pid(pid);
             if (job) {
                 job->state = JOB_STOPPED;
-                printf("[%d] Stopped\n", job->id);
+                printf("[%d] %s: Stopped\n", job->id, job->command);
             }
         }
     }
