@@ -7,11 +7,6 @@
 
 #include "../include/minishel.h"
 
-static int is_space(char c)
-{
-    return (c != ' ' && c != '\t');
-}
-
 void add_llist_env(char *pwd, minishel_t **llenv, const char *name)
 {
     add_llist(llenv, name, pwd);

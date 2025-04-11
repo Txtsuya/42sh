@@ -67,5 +67,5 @@ int main(int argc, char **argv, char **env)
     minishel_t *llenv;
 
     initialize_shell(env, &llenv);
-    return main_loop(&llenv, env);
+    return main_loop(&llenv);
 }
