@@ -42,9 +42,11 @@ int handle_variable(char **args, minishel_t **llenv)
 
     if (len_args == 1)
         print_var();
-    else {
-        cut_var = my_str_to_word_array(args[1], is_equal);
+    for (int i = 1; args[i]; i++) {
+        cut_var = my_str_to_word_array(args[i], is_equal);
         len_cut = len_array(cut_var);
+        if (check_right_argv(cut_var[0]) == 1)
+            return 1;
         if (len_cut == 2) {
             add_llist(variable, cut_var[0], cut_var[1]);
         } else {
@@ -53,4 +55,19 @@ int handle_variable(char **args, minishel_t **llenv)
         free_array(cut_var);
     }
     return 1;
+}
+
+int handle_unset(char **args, minishel_t **llenv)
+{
+    minishel_t **variable = get_variable();
+    minishel_t *tmp = *variable;
+    int len_args = len_array(args);
+
+    if (len_args == 1) {
+        fprintf(stderr, "unset: Too few arguments.\n");
+        return 1;
+    }
+    for (int i = 1; args[i]; i++)
+        delete_llist(variable, args[i]);
+    return 0;
 }
