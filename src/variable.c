@@ -69,5 +69,5 @@ int handle_unset(char **args, minishel_t **llenv)
     }
     for (int i = 1; args[i]; i++)
         delete_llist(variable, args[i]);
-    return 0;
+    return 1;
 }
