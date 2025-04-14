@@ -37,7 +37,7 @@ void *get_special_variable(char *name)
     return NULL;
 }
 
-char *get_special_variables(minishel_t **env, char *name)
+char *get_expand_variables(minishel_t **env, char *name)
 {
     if (my_strcmp(name, "term") == 0)
         return get_term(env, name);
@@ -91,7 +91,7 @@ char *expand_variables(char *input, minishel_t **env)
         if (input[i] == '$') {
             i++;
             var = get_variable_name(input, &i);
-            value = get_special_variables(env, var);
+            value = get_expand_variables(env, var);
             result = concat_result(result, value, &j);
         } else {
                 result[j] = input[i];
