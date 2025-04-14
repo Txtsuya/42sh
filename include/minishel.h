@@ -20,12 +20,21 @@
     #include <errno.h>
     #include <fcntl.h>
     #include <signal.h>
+    #include <time.h>
+    #include <ctype.h>
 
 typedef struct alias_ll {
     char *name;
     char **value;
     struct alias_ll *next;
 } alias_ll_t;
+
+typedef struct history {
+    char *cmd;
+    int idx;
+    char *hour;
+    struct history *next;
+} history_t;
 
 typedef struct minishel_s {
     char *name;
@@ -65,7 +74,7 @@ int builtin_cd(char **args, minishel_t **llenv);
 int my_setenv(char **args, minishel_t **llenv);
 int handle_env_commands(char **args, minishel_t **llenv);
 void print_env(minishel_t *head);
-void get_input(char **input, int ret_status, minishel_t **llenv);
+int get_input(char **input, int ret_status, minishel_t **llenv);
 void initialize_shell(char **env, minishel_t **llenv);
 int execute_command(char *path_cmd, char **args, minishel_t **llenv);
 int main_loop(minishel_t **llenv, char **env);
@@ -92,5 +101,15 @@ char *my_strchr(const char *str, int c);
 int handle_unalias(char **args, minishel_t **llenv);
 alias_ll_t **get_ll_alias(void);
 char **globbing(char **command);
+char **my_array_dup(char **array);
+void add_history(char *args);
+int print_history(char **args, minishel_t **llenv);
+int handle_exclamation(char **args);
+char *clean_str(const char *str);
+
+void checklen(const char *str, int i, int *len, int *space);
+int get_len_exclamation(char *line);
+char *get_value_in_history(char *line, int len);
+history_t **get_history(void);
 
 #endif

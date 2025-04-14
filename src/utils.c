@@ -7,7 +7,16 @@
 
 #include "../include/minishel.h"
 
-void get_input(char **input, int ret_status, minishel_t **llenv)
+static int check_valide_output(char *line)
+{
+    for (int i = 0; line[i] != '\0'; i++) {
+        if (line[i] != ' ' && line[i] != '\t' && line[i] != '\"')
+            return 0;
+    }
+    return 1;
+}
+
+int get_input(char **input, int ret_status, minishel_t **llenv)
 {
     size_t len = 0;
 
@@ -21,6 +30,13 @@ void get_input(char **input, int ret_status, minishel_t **llenv)
     if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n') {
         (*input)[my_strlen(*input) - 1] = '\0';
     }
+    if (check_valide_output(*input))
+        return 1;
+    *input = clean_str(*input);
+    if (handle_exclamation(input))
+        printf("%s\n", *input);
+    add_history(*input);
+    return 0;
 }
 
 void initialize_shell(char **env, minishel_t **llenv)
@@ -113,7 +129,8 @@ int main_loop(minishel_t **llenv, char **env)
     int status = 0;
 
     while (1) {
-        get_input(&input, status, llenv);
+        if (get_input(&input, status, llenv))
+            continue;
         status = execute_multi_cmd(llenv, input);
     }
     free(input);

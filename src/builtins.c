@@ -61,7 +61,7 @@ int handle_builtin_cmd(char ***arguments, char *input, minishel_t **llenv)
         {"/usr/bin/env", handle_env}, {"setenv", handle_setenv},
         {"unsetenv", handle_unsetenv}, {"exit", handle_exit},
         {"cd", handle_cd}, {"alias", handle_alias},
-        {"unalias", handle_unalias}, {NULL, NULL}};
+        {"unalias", handle_unalias}, {"history", print_history}, {NULL, NULL}};
 
     if (my_strcmp(input, "") == 0)
         return 1;
