@@ -7,6 +7,11 @@
 
 #include "../include/minishel.h"
 
+static int is_separator(char c)
+{
+    return (c == ';');
+}
+
 int get_redirection_index(const char *arg)
 {
     const char *redirection_tokens[] = {">", ">>", "<", "<<", NULL};
@@ -93,17 +98,15 @@ static void parse_token(char *token)
     }
 }
 
-static int handle_special_cmd(char *token, minishel_t **llenv)
+static int is_parentese(char *input)
 {
-    int status = 0;
+    int count = 0;
 
-    if (my_strstr(token, "&") != NULL)
-        return jobs_control(token, llenv);
-    if (my_strstr(token, "&&") != NULL)
-        return handle_and(token, llenv);
-    if (my_strstr(token, "||") != NULL)
-        return handle_or(token, llenv);
-    return -1;
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (input[i] == '(')
+            return 1;
+    }
+    return 0;
 }
 
 int handle_token(char *token, minishel_t **llenv)
@@ -111,26 +114,30 @@ int handle_token(char *token, minishel_t **llenv)
     int status = 0;
     int len = 0;
 
-    status = handle_special_cmd(token, llenv);
-    if (status != -1)
-        return status;
-    parse_token(token);
-    status = which_cmd(token, llenv);
+    if (is_parentese(token)) {
+        return handle_parenthese(llenv, token);
+    }
+    if (my_strstr(token, "&") != NULL) {
+        return handle_background(token, llenv);
+    }
+    if (my_strstr(token, "&&") != NULL)
+        status = handle_and(token, llenv);
+    else if (my_strstr(token, "||") != NULL)
+        status = handle_or(token, llenv);
+    else {
+        parse_token(token);
+        status = which_cmd(token, llenv);
+    }
     return status;
 }
 
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
+    char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
-    char *token;
-    char *ptr;
-    char *new = my_strdup(input);
 
-    free(input);
-    token = strtok_r(new, ";", &ptr);
-    while (token != NULL) {
-        status = handle_token(token, llenv);
-        token = strtok_r(NULL, ";", &ptr);
+    for (int i = 0; all_cmd[i] != NULL; i++) {
+        status = handle_token(all_cmd[i], llenv);
     }
     return status;
 }

@@ -49,19 +49,6 @@ job_t *find_job_by_id(int job_id)
     return NULL;
 }
 
-job_t *find_job_by_pid(pid_t pid)
-{
-    job_t **jobs = get_job_list();
-    job_t *current = *jobs;
-
-    while (current) {
-        if (current->pid == pid)
-            return current;
-        current = current->next;
-    }
-    return NULL;
-}
-
 void remove_job(int job_id)
 {
     job_t **jobs = get_job_list();
@@ -83,6 +70,33 @@ void remove_job(int job_id)
     }
 }
 
+job_t *find_job_by_pid(pid_t pid)
+{
+    job_t **jobs = get_job_list();
+    job_t *current = *jobs;
+
+    while (current) {
+        if (current->pid == pid)
+            return current;
+        current = current->next;
+    }
+    return NULL;
+}
+
+void print_jobs_done(void)
+{
+    job_t **jobs = get_job_list();
+    job_t *current = *jobs;
+
+    while (current) {
+        if (current->state == JOB_DONE) {
+            printf("[%d] %s:Done\n", current->id, current->command);
+            remove_job(current->id);
+        }
+        current = current->next;
+    }
+}
+
 void update_jobs_status(void)
 {
     int status;
@@ -92,23 +106,13 @@ void update_jobs_status(void)
         if (WIFEXITED(status) || WIFSIGNALED(status)) {
             job_t *job = find_job_by_pid(pid);
             if (job) {
-                if (isatty(STDOUT_FILENO)) {
-                    write(STDOUT_FILENO, "\n", 1);
-                }
-                printf("[%d] %s: Done\n", job->id, job->command);
-                remove_job(job->id);
-            }
-        } else if (WIFSTOPPED(status)) {
-            job_t *job = find_job_by_pid(pid);
-            if (job) {
-                job->state = JOB_STOPPED;
-                printf("[%d] %s: Stopped\n", job->id, job->command);
+                job->state = JOB_DONE;
             }
         }
     }
 }
 
-void print_jobs(void)
+int print_jobs(void)
 {
     job_t **jobs = get_job_list();
     job_t *current = *jobs;
@@ -120,4 +124,5 @@ void print_jobs(void)
                current->command);
         current = current->next;
     }
+    return 1;
 }

@@ -47,6 +47,23 @@ typedef struct pipeline_s {
     minishel_t **env;
 } pipeline_t;
 
+typedef struct s_pipe_ctx {
+    int num_of_pipe;
+    int (*pipefd)[2];
+    pid_t *pid;
+    minishel_t **env;
+    char **argv;
+    int read_pipe;
+    int write_pipe;
+} pipe_ctx_t;
+
+typedef struct {
+    int index;
+    int start;
+    int level;
+    int i;
+} parse_ctx_t;
+
 typedef enum job_state {
     JOB_RUNNING,
     JOB_STOPPED,
@@ -61,20 +78,30 @@ typedef struct job_s {
     struct job_s *next;
 } job_t;
 
-void handle_sigchld(int sig);
-int check_stop_status(pid_t child_pid, int status);
-
-void print_jobs(void);
-void update_jobs_status(void);
-void remove_job(int job_id);
-job_t *find_job_by_pid(pid_t pid);
+int background(char **args);
+void print_jobs_done(void);
 job_t *find_job_by_id(int job_id);
+void remove_job(int job_id);
+int forground(char **args);
+int print_jobs(void);
+job_t *find_job_by_pid(pid_t pid);
 job_t *add_job(pid_t pid, char *cmd);
-job_t **get_job_list(void);
+int handle_background(char *cmd, minishel_t **llenv);
+int execute_background(char *cmd, minishel_t **llenv);
+void update_jobs_status(void);
 
-int background(char **cmd, minishel_t **env);
-int forground(char **cmd, minishel_t **env);
-int jobs_control(char *cmd, minishel_t **llenv);
+int is_simple_sep(char c);
+int is_double_sep(char *str, int i);
+int is_pipe(char c);
+int is_redirection(char c);
+int search_pipe(char *input);
+char **string_to_array_for_parentheses(char *input);
+char *clean_parenthese_argv(char *cmd);
+int is_red_or_operator(char *cmd);
+int handle_redirection_in_parenthese(char **all_arg, minishel_t **llenv);
+int check_error_parenthese(char **all_arg, char *input, int arraylen);
+int handle_parenthese(minishel_t **llenv, char *input);
+char **string_to_array_with_priority(char *input, int (*func)(char));
 
 int handle_env(char **args, minishel_t **llenv);
 int handle_setenv(char **args, minishel_t **llenv);
@@ -82,6 +109,7 @@ int handle_unsetenv(char **args, minishel_t **llenv);
 int handle_exit(char **args, minishel_t **llenv);
 int handle_cd(char **args, minishel_t **llenv);
 int handle_variable(char **args, minishel_t **llenv);
+int handle_unset(char **args, minishel_t **llenv);
 void add_llist_env(char *pwd, minishel_t **llenv, const char *name);
 void add_llist(minishel_t **head, const char *name, char *value);
 char *my_getenv(minishel_t *head, const char *name);
@@ -95,10 +123,10 @@ int builtin_cd(char **args, minishel_t **llenv);
 int my_setenv(char **args, minishel_t **llenv);
 int handle_env_commands(char **args, minishel_t **llenv);
 void print_env(minishel_t *head);
-int get_input(char **input, int ret_status, minishel_t **llenv);
+void get_input(char **input, int ret_status, minishel_t **llenv);
 void initialize_shell(char **env, minishel_t **llenv);
 int execute_command(char *path_cmd, char **args, minishel_t **llenv);
-int main_loop(minishel_t **llenv, char **env);
+int main_loop(minishel_t **llenv);
 int len_array(char **array);
 int replace_in_list(minishel_t **head, char const *name, char *value);
 int seg_exit(int status);

@@ -14,26 +14,25 @@ int is_sep(char c)
 
 int execute_background(char *cmd, minishel_t **llenv)
 {
-    int pid = fork();
+    job_t *added_jobs = NULL;
+    pid_t pid = fork();
 
     if (pid == 0) {
-        setpgid(0, 0);
-        exit(execute_multi_cmd(llenv, cmd));
+        exit(execute_main_cmd(cmd, llenv));
     } else {
-        job_t *job = add_job(pid, cmd);
-        printf("[%d] %d\n", job->id, pid);
+        added_jobs = add_job(pid, cmd);
+        printf("[%d] %d\n", added_jobs->id, pid);
     }
     return 0;
 }
 
-int jobs_control(char *cmd, minishel_t **llenv)
+int handle_background(char *cmd, minishel_t **llenv)
 {
-    int status = 0;
     char **all_cmd = my_str_to_word_array(cmd, is_sep);
     int len = len_array(all_cmd);
 
     for (int i = 0; all_cmd[i]; i++) {
-        status = execute_background(all_cmd[i], llenv);
+        execute_background(all_cmd[i], llenv);
     }
-    return status;
+    return 0;
 }
