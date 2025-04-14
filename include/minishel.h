@@ -134,6 +134,6 @@ int is_equal(char c);
 char *expand_variables(char *input, minishel_t **env);
 char *get_special_variables(minishel_t **env, char *name);
 char *get_variable_name(char *input, int *i);
-char *get_special_variable(char *name);
+void *get_special_variable(char *name);
 
 #endif

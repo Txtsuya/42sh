@@ -21,15 +21,18 @@ static char *get_cwd(minishel_t **env)
     return my_getenv(*env, "PWD");
 }
 
-char *get_special_variable(char *name)
+void *get_special_variable(char *name)
 {
-    minishel_t **precmd_var = get_variable();
-    minishel_t *tmp = *precmd_var;
+    minishel_t **var = get_variable();
+    minishel_t *current;
 
-    while (tmp) {
-        if (my_strcmp(tmp->name, name) == 0)
-            return tmp->value;
-        tmp = tmp->next;
+    if (var == NULL || *var == NULL)
+        return NULL;
+    current = *var;
+    while (current != NULL) {
+        if (my_strcmp(current->name, name) == 0)
+            return current;
+        current = current->next;
     }
     return NULL;
 }

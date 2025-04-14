@@ -7,7 +7,7 @@
 
 #include "minishel.h"
 
-static int is_equal(char c)
+int is_equal(char c)
 {
     return (c != '=');
 }
@@ -47,8 +47,9 @@ int handle_variable(char **args, minishel_t **llenv)
         len_cut = len_array(cut_var);
         if (len_cut == 2)
             add_llist(variable, cut_var[0], cut_var[1]);
-        else
+        else {
             add_llist(variable, cut_var[0], NULL);
+        }
         free_array(cut_var);
     }
     return 1;
