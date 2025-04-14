@@ -124,9 +124,16 @@ int handle_unalias(char **args, minishel_t **llenv);
 alias_ll_t **get_ll_alias(void);
 char **globbing(char **command);
 
+//variable handling
+minishel_t **get_variable(void);
+void print_var(void);
+int handle_variable(char **args, minishel_t **llenv);
+int is_equal(char c);
+
 //special variable handling
 char *expand_variables(char *input, minishel_t **env);
 char *get_special_variables(minishel_t **env, char *name);
 char *get_variable_name(char *input, int *i);
+char *get_special_variable(char *name);
 
 #endif

@@ -21,12 +21,26 @@ static char *get_cwd(minishel_t **env)
     return my_getenv(*env, "PWD");
 }
 
+char *get_special_variable(char *name)
+{
+    minishel_t **precmd_var = get_variable();
+    minishel_t *tmp = *precmd_var;
+
+    while (tmp) {
+        if (my_strcmp(tmp->name, name) == 0)
+            return tmp->value;
+        tmp = tmp->next;
+    }
+    return NULL;
+}
+
 char *get_special_variables(minishel_t **env, char *name)
 {
     if (my_strcmp(name, "term") == 0)
         return get_term(env, name);
     if (my_strcmp(name, "cwd") == 0)
         return get_cwd(env);
+    return NULL;
 }
 
 char *get_variable_name(char *input, int *i)

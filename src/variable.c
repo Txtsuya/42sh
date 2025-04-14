@@ -45,11 +45,10 @@ int handle_variable(char **args, minishel_t **llenv)
     else {
         cut_var = my_str_to_word_array(args[1], is_equal);
         len_cut = len_array(cut_var);
-        if (len_cut == 2) {
+        if (len_cut == 2)
             add_llist(variable, cut_var[0], cut_var[1]);
-        } else {
+        else
             add_llist(variable, cut_var[0], NULL);
-        }
         free_array(cut_var);
     }
     return 1;
