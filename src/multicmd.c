@@ -7,6 +7,11 @@
 
 #include "../include/minishel.h"
 
+static int is_separator(char c)
+{
+    return (c == ';');
+}
+
 int get_redirection_index(const char *arg)
 {
     const char *redirection_tokens[] = {">", ">>", "<", "<<", NULL};
@@ -93,11 +98,25 @@ static void parse_token(char *token)
     }
 }
 
+static int is_parentese(char *input)
+{
+    int count = 0;
+
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (input[i] == '(')
+            return 1;
+    }
+    return 0;
+}
+
 int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;
 
+    if (is_parentese(token)) {
+        return handle_parenthese(llenv, token);
+    }
     if (my_strstr(token, "&&") != NULL)
         status = handle_and(token, llenv);
     else if (my_strstr(token, "||") != NULL)
@@ -111,16 +130,11 @@ int handle_token(char *token, minishel_t **llenv)
 
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
+    char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
-    char *token;
-    char *ptr;
-    char *new = my_strdup(input);
 
-    free(input);
-    token = strtok_r(new, ";", &ptr);
-    while (token != NULL) {
-        status = handle_token(token, llenv);
-        token = strtok_r(NULL, ";", &ptr);
+    for (int i = 0; all_cmd[i] != NULL; i++) {
+        status = handle_token(all_cmd[i], llenv);
     }
     return status;
 }

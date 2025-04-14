@@ -28,6 +28,7 @@ int handle_unsetenv(char **args, minishel_t **llenv)
 int handle_exit(char **args, minishel_t **llenv)
 {
     free_all();
+    write(1, "exit\n", 5);
     exit(0);
     return 1;
 }

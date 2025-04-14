@@ -12,7 +12,7 @@ static int redir_out(char *name)
     int fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
     if (fd < 0) {
-        perror("open");
+        perror(name);
         return 1;
     }
     dup2(fd, STDOUT_FILENO);
@@ -25,7 +25,7 @@ static int redir_append(char *name)
     int fd = open(name, O_WRONLY | O_CREAT | O_APPEND, 0644);
 
     if (fd < 0) {
-        perror("open");
+        perror(name);
         return 1;
     }
     dup2(fd, STDOUT_FILENO);
@@ -38,7 +38,7 @@ static int redir_in(char *name)
     int fd = open(name, O_RDONLY);
 
     if (fd < 0) {
-        perror("open");
+        perror(name);
         return 1;
     }
     dup2(fd, STDIN_FILENO);
