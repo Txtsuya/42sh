@@ -34,10 +34,9 @@ static int error_command_not_found(char *path_cmd, char *args)
     if (path_cmd == NULL) {
         my_putstr(args);
         my_putstr(": Command not found.\n");
-        write(2, args, my_strlen(args));
-        write(2, ": Command not found.\n", 21);
         exit(1);
     }
+    return 0;
 }
 
 static int execve_error(char *command)
@@ -106,7 +105,7 @@ char *get_path_cmd(char *args, minishel_t **llenv)
     return path_cmd;
 }
 
-int main_loop(minishel_t **llenv, char **env)
+int main_loop(minishel_t **llenv)
 {
     char *input = NULL;
     int status = 0;

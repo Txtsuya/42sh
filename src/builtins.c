@@ -7,11 +7,6 @@
 
 #include "../include/minishel.h"
 
-static int is_space(char c)
-{
-    return (c != ' ' && c != '\t');
-}
-
 void add_llist_env(char *pwd, minishel_t **llenv, const char *name)
 {
     add_llist(llenv, name, pwd);
@@ -60,7 +55,8 @@ int handle_builtin_cmd(char ***arguments, char *input, minishel_t **llenv)
     command_t commands[] = {{"env", handle_env},
         {"/usr/bin/env", handle_env}, {"setenv", handle_setenv},
         {"unsetenv", handle_unsetenv}, {"exit", handle_exit},
-        {"cd", handle_cd}, {NULL, NULL}};
+        {"cd", handle_cd}, {"alias", handle_alias},
+        {"unalias", handle_unalias}, {"set", handle_variable}, {NULL, NULL}};
 
     if (my_strcmp(input, "") == 0)
         return 1;

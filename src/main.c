@@ -35,7 +35,9 @@ int seg_exit(int status)
             return 136;
         }
     }
-    return 0;
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    return 1;
 }
 
 void add_llist(minishel_t **head, const char *name, char *value)
@@ -65,5 +67,5 @@ int main(int argc, char **argv, char **env)
     minishel_t *llenv;
 
     initialize_shell(env, &llenv);
-    return main_loop(&llenv, env);
+    return main_loop(&llenv);
 }

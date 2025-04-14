@@ -8,13 +8,16 @@
 NAME	 	=		42sh
 
 
-SRCS		=		$(wildcard src/*.c) \
-					$(wildcard ./lib/my/*.c) $(wildcard ./lib/my_malloc/*.c)
+SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c) \
+					$(wildcard src/parentese_sys/*.c) \
+					$(wildcard ./lib/my_malloc/*.c)
 
-OBJS            =               $(SRCS:.c=.o)
+OBJS        =               $(SRCS:.c=.o)
+
+CFLAGS  	=	-Wall -Wextra -Wno-unused -I ./include
 
 $(NAME)         :               $(OBJS)
-				 	gcc -o $(NAME) $(OBJS) $(CFLAGS)
+				 	gcc -Wall -Wextra -o $(NAME) $(OBJS) $(CFLAGS)
 
 all             :               $(NAME)
 
