@@ -45,10 +45,12 @@ int execute_main_cmd(char *cmd, minishel_t **llenv)
 
 int nbr_instr(char const *str, char c)
 {
+    level_ini_t level = {0};
     int cpt = 0;
 
     for (int i = 0; str[i]; i++) {
-        if (str[i] == c)
+        update_level(&level, str[i]);
+        if (str[i] == c && is_level_0(&level))
             cpt++;
     }
     return cpt > 0 ? cpt + 1 : 0;

@@ -117,7 +117,7 @@ int execute_command(char *path_cmd, char **args, minishel_t **llenv)
     if (pid == 0) {
         restore_signal();
         setpgid(0, 0);
-        return handle_child_process(path_cmd, args, env_array);
+        return handle_child_process(path_cmd, clean_quote(args), env_array);
     } else {
         return handle_parent_process(path_cmd, args, pid, env_array);
     }

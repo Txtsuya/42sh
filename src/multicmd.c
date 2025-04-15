@@ -117,12 +117,12 @@ static int handle_token(char *token, minishel_t **llenv)
     if (is_parentese(token)) {
         return handle_parenthese(llenv, token);
     }
+    if (my_strstr(token, "&&") != NULL)
+        return handle_and(token, llenv);
     if (my_strstr(token, "&") != NULL) {
         return handle_background(token, llenv);
     }
-    if (my_strstr(token, "&&") != NULL)
-        status = handle_and(token, llenv);
-    else if (my_strstr(token, "||") != NULL)
+    if (my_strstr(token, "||") != NULL)
         status = handle_or(token, llenv);
     else {
         parse_token(token);

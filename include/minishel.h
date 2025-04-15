@@ -64,6 +64,12 @@ typedef struct {
     int i;
 } parse_ctx_t;
 
+typedef struct {
+    int level_par;
+    int level_signle;
+    int level_double;
+} level_ini_t;
+
 typedef enum job_state {
     JOB_RUNNING,
     JOB_STOPPED,
@@ -78,6 +84,9 @@ typedef struct job_s {
     struct job_s *next;
 } job_t;
 
+char **clean_quote(char **array);
+int is_level_0(level_ini_t *level);
+void update_level(level_ini_t *level, char input);
 job_t **get_job_list(void);
 void safely_print_jobs_done(void);
 
