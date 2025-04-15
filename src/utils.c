@@ -12,10 +12,8 @@ void get_input(char **input, int ret_status, minishel_t **llenv)
     size_t len = 0;
     minishel_t *precmd_value = (minishel_t *)get_special_variable("precmd");
 
-    if (precmd_value && precmd_value->value && isatty(STDIN_FILENO)) {
-        printf("precmd_value->value est NULL ??? : %s\n", precmd_value->value);
+    if (precmd_value && precmd_value->value && isatty(STDIN_FILENO))
         execute_multi_cmd(llenv, precmd_value->value);
-    }
     if (isatty(STDIN_FILENO)) {
         my_putstr(my_getenv(*llenv, "PWD"));
         my_putstr(" > ");
@@ -29,9 +27,8 @@ void get_input(char **input, int ret_status, minishel_t **llenv)
         }
         exit(ret_status);
     }
-    if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n') {
+    if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n')
         (*input)[my_strlen(*input) - 1] = '\0';
-    }
 }
 
 void initialize_shell(char **env, minishel_t **llenv)

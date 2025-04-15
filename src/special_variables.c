@@ -26,10 +26,8 @@ minishel_t *get_special_variable(char *name)
     minishel_t **var = get_variable();
     minishel_t *current;
 
-    printf("avant check null\n");
     if (var == NULL || *var == NULL)
         return NULL;
-    printf("apres check null\n");
     current = *var;
     while (current != NULL) {
         if (my_strcmp(current->name, name) == 0)
