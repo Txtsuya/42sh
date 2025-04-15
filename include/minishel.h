@@ -20,6 +20,7 @@
     #include <errno.h>
     #include <fcntl.h>
     #include <signal.h>
+    #include <termios.h>
 
 typedef struct alias_ll {
     char *name;
@@ -62,6 +63,34 @@ typedef struct {
     int level;
     int i;
 } parse_ctx_t;
+
+typedef enum job_state {
+    JOB_RUNNING,
+    JOB_STOPPED,
+    JOB_DONE
+} job_state_t;
+
+typedef struct job_s {
+    int id;
+    char *command;
+    pid_t pid;
+    job_state_t state;
+    struct job_s *next;
+} job_t;
+
+job_t **get_job_list(void);
+
+int background(char **args);
+void print_jobs_done(void);
+job_t *find_job_by_id(int job_id);
+void remove_job(int job_id);
+int forground(char **args);
+int print_jobs(void);
+job_t *find_job_by_pid(pid_t pid);
+job_t *add_job(pid_t pid, char *cmd);
+int handle_background(char *cmd, minishel_t **llenv);
+int execute_background(char *cmd, minishel_t **llenv);
+void update_jobs_status(void);
 
 int is_simple_sep(char c);
 int is_double_sep(char *str, int i);

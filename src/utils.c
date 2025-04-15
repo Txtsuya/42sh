@@ -64,22 +64,68 @@ static int handle_child_process(char *path_cmd, char **args, char **env_array)
     return 0;
 }
 
+static void setup_terminal_for_child(pid_t child_pid, struct sigaction *old_sa_ttou)
+{
+    struct sigaction sa_ttou;
+    sa_ttou.sa_handler = SIG_IGN;
+    sigemptyset(&sa_ttou.sa_mask);
+    sa_ttou.sa_flags = 0;
+    sigaction(SIGTTOU, &sa_ttou, old_sa_ttou);
+    tcsetpgrp(STDIN_FILENO, child_pid);
+}
+
+static void restore_terminal(struct sigaction *old_sa_ttou)
+{
+    tcsetpgrp(STDIN_FILENO, getpgrp());
+    sigaction(SIGTTOU, old_sa_ttou, NULL);
+}
+
+static void handle_job_status_after_wait(pid_t child_pid, int status, job_t *added_jobs, char *path_cmd, char **env_array, char **args)
+{
+    job_t *job = NULL;
+    my_free(path_cmd);
+    free_array(env_array);
+    free_array(args);
+    if (WIFSTOPPED(status)) {
+        kill(-child_pid, SIGSTOP);
+        job = find_job_by_pid(child_pid);
+        printf("[%d]+  Stopped\t%s\n", job->id, job->command);
+        job->state = JOB_STOPPED;
+    } else {
+        remove_job(added_jobs->id);
+    }
+}
+
 static int handle_parent_process(char *path_cmd, char **args,
     pid_t child_pid, char **env_array)
 {
     int status;
+    struct sigaction old_sa_ttou;
+    job_t *added_jobs = NULL;
 
-    waitpid(child_pid, &status, 0);
-    my_free(path_cmd);
-    free_array(env_array);
-    free_array(args);
+    setpgid(child_pid, child_pid);
+    added_jobs = add_job(child_pid, args[0]);
+    setup_terminal_for_child(child_pid, &old_sa_ttou);
+    waitpid(child_pid, &status, WUNTRACED);
+    restore_terminal(&old_sa_ttou);
+    handle_job_status_after_wait(child_pid, status, added_jobs, path_cmd, env_array, args);
     return seg_exit(status);
+}
+
+static void restore_signal(void)
+{
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    signal(SIGTSTP, SIG_DFL);
+    signal(SIGTTIN, SIG_DFL);
+    signal(SIGTTOU, SIG_DFL);
 }
 
 int execute_command(char *path_cmd, char **args, minishel_t **llenv)
 {
     pid_t pid;
     char **env_array;
+    int shell = getpid();
 
     env_array = ll_to_array_env(*llenv);
     pid = fork();
@@ -88,6 +134,8 @@ int execute_command(char *path_cmd, char **args, minishel_t **llenv)
         exit(1);
     }
     if (pid == 0) {
+        restore_signal();
+        setpgid(0, 0);
         return handle_child_process(path_cmd, args, env_array);
     } else {
         return handle_parent_process(path_cmd, args, pid, env_array);
@@ -105,12 +153,33 @@ char *get_path_cmd(char *args, minishel_t **llenv)
     return path_cmd;
 }
 
+void safely_print_jobs_done(void)
+{
+    // Block SIGTTOU while manipulating terminal
+    struct sigaction sa_ttou, old_sa_ttou;
+    sa_ttou.sa_handler = SIG_IGN;
+    sigemptyset(&sa_ttou.sa_mask);
+    sa_ttou.sa_flags = 0;
+    sigaction(SIGTTOU, &sa_ttou, &old_sa_ttou);
+    
+    // Ensure we own the terminal
+    tcsetpgrp(STDIN_FILENO, getpgrp());
+    
+    // Now it's safe to print
+    print_jobs_done();
+    
+    // Restore signal handler
+    sigaction(SIGTTOU, &old_sa_ttou, NULL);
+}
+
 int main_loop(minishel_t **llenv)
 {
     char *input = NULL;
     int status = 0;
 
     while (1) {
+        update_jobs_status();
+        safely_print_jobs_done();
         get_input(&input, status, llenv);
         status = execute_multi_cmd(llenv, input);
     }
