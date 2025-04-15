@@ -176,6 +176,7 @@ void add_history(char *args);
 int print_history(char **args, minishel_t **llenv);
 int handle_exclamation(char **args);
 char *clean_str(const char *str);
+int find_start(const char *str);
 
 void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
