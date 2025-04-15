@@ -10,8 +10,9 @@
 static int check_valide_output(char *line)
 {
     for (int i = 0; line[i] != '\0'; i++) {
-        if (line[i] != ' ' && line[i] != '\t' && line[i] != '\"')
+        if (line[i] != ' ' && line[i] != '\t' && line[i] != '\"') {
             return 0;
+        }
     }
     return 1;
 }
@@ -67,7 +68,8 @@ int main_loop(minishel_t **llenv)
     while (1) {
         update_jobs_status();
         safely_print_jobs_done();
-        get_input(&input, status, llenv);
+        if (get_input(&input, status, llenv))
+            continue;
         status = execute_multi_cmd(llenv, input);
     }
     free(input);
