@@ -78,6 +78,8 @@ typedef struct job_s {
     struct job_s *next;
 } job_t;
 
+job_t **get_job_list(void);
+
 int background(char **args);
 void print_jobs_done(void);
 job_t *find_job_by_id(int job_id);
