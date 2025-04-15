@@ -7,28 +7,6 @@
 
 #include "../include/minishel.h"
 
-void get_input(char **input, int ret_status, minishel_t **llenv)
-{
-    size_t len = 0;
-
-    if (isatty(STDIN_FILENO)) {
-        my_putstr(my_getenv(*llenv, "PWD"));
-        my_putstr(" > ");
-    }
-    if (getline(input, &len, stdin) == -1) {
-        exit(ret_status);
-    }
-    if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n') {
-        (*input)[my_strlen(*input) - 1] = '\0';
-    }
-}
-
-void initialize_shell(char **env, minishel_t **llenv)
-{
-    *llenv = NULL;
-    env_array_to_env_ll(env, llenv);
-}
-
 static int error_command_not_found(char *path_cmd, char *args)
 {
     if (path_cmd == NULL) {
@@ -64,9 +42,11 @@ static int handle_child_process(char *path_cmd, char **args, char **env_array)
     return 0;
 }
 
-static void setup_terminal_for_child(pid_t child_pid, struct sigaction *old_sa_ttou)
+static void setup_terminal_for_child(pid_t child_pid,
+    struct sigaction *old_sa_ttou)
 {
     struct sigaction sa_ttou;
+
     sa_ttou.sa_handler = SIG_IGN;
     sigemptyset(&sa_ttou.sa_mask);
     sa_ttou.sa_flags = 0;
@@ -80,12 +60,11 @@ static void restore_terminal(struct sigaction *old_sa_ttou)
     sigaction(SIGTTOU, old_sa_ttou, NULL);
 }
 
-static void handle_job_status_after_wait(pid_t child_pid, int status, job_t *added_jobs, char *path_cmd, char **env_array, char **args)
+static void handle_job_status_after_wait(pid_t child_pid,
+    int status, job_t *added_jobs)
 {
     job_t *job = NULL;
-    my_free(path_cmd);
-    free_array(env_array);
-    free_array(args);
+
     if (WIFSTOPPED(status)) {
         kill(-child_pid, SIGSTOP);
         job = find_job_by_pid(child_pid);
@@ -108,7 +87,10 @@ static int handle_parent_process(char *path_cmd, char **args,
     setup_terminal_for_child(child_pid, &old_sa_ttou);
     waitpid(child_pid, &status, WUNTRACED);
     restore_terminal(&old_sa_ttou);
-    handle_job_status_after_wait(child_pid, status, added_jobs, path_cmd, env_array, args);
+    handle_job_status_after_wait(child_pid, status, added_jobs);
+    my_free(path_cmd);
+    free_array(env_array);
+    free_array(args);
     return seg_exit(status);
 }
 
@@ -125,7 +107,6 @@ int execute_command(char *path_cmd, char **args, minishel_t **llenv)
 {
     pid_t pid;
     char **env_array;
-    int shell = getpid();
 
     env_array = ll_to_array_env(*llenv);
     pid = fork();
@@ -151,39 +132,4 @@ char *get_path_cmd(char *args, minishel_t **llenv)
     else
         path_cmd = my_strdup(args);
     return path_cmd;
-}
-
-void safely_print_jobs_done(void)
-{
-    // Block SIGTTOU while manipulating terminal
-    struct sigaction sa_ttou, old_sa_ttou;
-    sa_ttou.sa_handler = SIG_IGN;
-    sigemptyset(&sa_ttou.sa_mask);
-    sa_ttou.sa_flags = 0;
-    sigaction(SIGTTOU, &sa_ttou, &old_sa_ttou);
-    
-    // Ensure we own the terminal
-    tcsetpgrp(STDIN_FILENO, getpgrp());
-    
-    // Now it's safe to print
-    print_jobs_done();
-    
-    // Restore signal handler
-    sigaction(SIGTTOU, &old_sa_ttou, NULL);
-}
-
-int main_loop(minishel_t **llenv)
-{
-    char *input = NULL;
-    int status = 0;
-
-    while (1) {
-        update_jobs_status();
-        safely_print_jobs_done();
-        get_input(&input, status, llenv);
-        status = execute_multi_cmd(llenv, input);
-    }
-    free(input);
-    free_all();
-    return status;
 }

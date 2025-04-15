@@ -79,6 +79,7 @@ typedef struct job_s {
 } job_t;
 
 job_t **get_job_list(void);
+void safely_print_jobs_done(void);
 
 int background(char **args);
 void print_jobs_done(void);

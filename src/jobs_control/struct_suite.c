@@ -49,3 +49,13 @@ job_t *find_job_by_id(int job_id)
     }
     return NULL;
 }
+
+int len_array(char **array)
+{
+    int i = 0;
+
+    while (array[i] != NULL) {
+        i++;
+    }
+    return i;
+}

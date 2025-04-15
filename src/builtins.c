@@ -58,8 +58,8 @@ int handle_builtin_cmd(char ***arguments, char *input, minishel_t **llenv)
         {"cd", handle_cd}, {"alias", handle_alias},
         {"unalias", handle_unalias}, {"set", handle_variable},
         {"jobs", print_jobs}, {"fg", forground},
-        {"bg", background}, {NULL, NULL}};
-        {"unset", handle_unset}, {NULL, NULL}};
+        {"bg", background}, {"unset", handle_unset},
+        {NULL, NULL}};
 
     if (my_strcmp(input, "") == 0)
         return 1;
