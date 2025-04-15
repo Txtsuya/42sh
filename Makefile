@@ -42,7 +42,7 @@ clean_test		:
 
 re              :               fclean all
 
-val		:		$(OBJS)
+val		:
 			gcc -o $(NAME) $(SRCS) $(CFLAGS) -g3
 
 run 	:		re

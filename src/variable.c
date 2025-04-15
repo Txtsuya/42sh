@@ -19,7 +19,16 @@ minishel_t **get_variable(void)
     return &variable;
 }
 
-void print_var(void)
+int find_start(const char *str)
+{
+    int i = 0;
+
+    while (str[i] && isspace((unsigned char)str[i]))
+        i++;
+    return i;
+}
+
+static void print_var(void)
 {
     minishel_t **variable = get_variable();
     minishel_t *tmp = *variable;

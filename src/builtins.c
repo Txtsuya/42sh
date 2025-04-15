@@ -56,8 +56,8 @@ int handle_builtin_cmd(char ***arguments, char *input, minishel_t **llenv)
         {"/usr/bin/env", handle_env}, {"setenv", handle_setenv},
         {"unsetenv", handle_unsetenv}, {"exit", handle_exit},
         {"cd", handle_cd}, {"alias", handle_alias},
-        {"unalias", handle_unalias}, {"set", handle_variable},
-        {"jobs", print_jobs}, {"fg", forground},
+        {"unalias", handle_unalias}, {"history", print_history},
+        {"set", handle_variable}, {"jobs", print_jobs}, {"fg", forground},
         {"bg", background}, {"unset", handle_unset},
         {NULL, NULL}};
 
