@@ -21,6 +21,18 @@ static char *get_cwd(minishel_t **env)
     return my_getenv(*env, "PWD");
 }
 
+int handle_ignoreeof(char **input)
+{
+    if (get_special_variable("ignoreeof") != NULL
+        && isatty(STDIN_FILENO)) {
+        printf("\nUse 'exit' to leave 42sh.\n");
+        *input = my_strdup("");
+        clearerr(stdin);
+        return 0;
+    }
+    return 84;
+}
+
 minishel_t *get_special_variable(char *name)
 {
     minishel_t **var = get_variable();
@@ -37,7 +49,7 @@ minishel_t *get_special_variable(char *name)
     return NULL;
 }
 
-char *get_expand_variables(minishel_t **env, char *name)
+static char *get_expand_variables(minishel_t **env, char *name)
 {
     if (my_strcmp(name, "term") == 0)
         return get_term(env, name);

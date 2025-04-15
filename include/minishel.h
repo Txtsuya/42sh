@@ -132,8 +132,8 @@ int is_equal(char c);
 
 //special variable handling
 char *expand_variables(char *input, minishel_t **env);
-char *get_expand_variables(minishel_t **env, char *name);
 char *get_variable_name(char *input, int *i);
 minishel_t *get_special_variable(char *name);
+int handle_ignoreeof(char **input);
 
 #endif

@@ -19,10 +19,7 @@ void get_input(char **input, int ret_status, minishel_t **llenv)
         my_putstr(" > ");
     }
     if (getline(input, &len, stdin) == -1) {
-        if (get_special_variable("ignoreeof") != NULL && isatty(STDIN_FILENO)) {
-            printf("\nUse 'exit' to leave 42sh.\n");
-            *input = my_strdup("");
-            clearerr(stdin);
+        if (handle_ignoreeof(input) == 0) {
             return;
         }
         exit(ret_status);
