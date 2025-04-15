@@ -120,13 +120,12 @@ int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env)
 {
     pipeline_t pl = {.read_fd = -1, .nbr_cmd = nbr_cmd, .env = env};
     char *ptr = NULL;
-    char *token = strtok_r(commands, "|", &ptr);
+    char **token = string_to_array_with_priority(commands, is_pipe);
     int status = 0;
 
-    for (int i = 0; i < nbr_cmd && token; i++) {
-        if (process_command(token, &pl, i, &status))
+    for (int i = 0; token[i]; i++) {
+        if (process_command(token[i], &pl, i, &status))
             return 1;
-        token = strtok_r(NULL, "|", &ptr);
     }
     for (int i = 0; i < nbr_cmd; i++)
         wait(NULL);

@@ -35,7 +35,7 @@ char **my_concat_glob(char **command, glob_t *glob)
     int i = 0;
 
     for (i = 0; match[i]; i++) {
-        command = realloc(command, sizeof(char *) * (n + i + 1));
+        command = realloc(command, sizeof(char *) * (n + i + 2));
         if (!command)
             exit(84);
         command[n + i] = strdup(match[i]);
@@ -57,8 +57,11 @@ char **globbing(char **command)
     if (!pattern)
         return command;
     r = glob(pattern, GLOB_ERR, NULL, &g_struct);
-    if (r == 0) {
+    if (r == 0)
         return my_concat_glob(command, &g_struct);
+    else if (r == GLOB_NOMATCH) {
+        fprintf(stderr, "%s: No match.\n", command[0]);
+        return NULL;
     }
     globfree(&g_struct);
     return command;
