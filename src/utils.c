@@ -107,7 +107,6 @@ int execute_command(char *path_cmd, char **args, minishel_t **llenv)
 {
     pid_t pid;
     char **env_array;
-    int shell = getpid();
 
     env_array = ll_to_array_env(*llenv);
     pid = fork();
