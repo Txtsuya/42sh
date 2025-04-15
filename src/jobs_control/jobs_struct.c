@@ -93,12 +93,12 @@ int print_jobs(void)
 {
     job_t **jobs = get_job_list();
     job_t *current = *jobs;
-    
+
     while (current) {
-        printf("[%d] %s %s\n", 
-               current->id, 
-               current->state == JOB_RUNNING ? "Running" : "Stopped",
-               current->command);
+        printf("[%d] %s %s\n",
+            current->id,
+            current->state == JOB_RUNNING ? "Running" : "Stopped",
+            current->command);
         current = current->next;
     }
     return 1;

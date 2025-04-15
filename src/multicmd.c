@@ -109,7 +109,7 @@ static int is_parentese(char *input)
     return 0;
 }
 
-int handle_token(char *token, minishel_t **llenv)
+static int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;

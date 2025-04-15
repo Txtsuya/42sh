@@ -64,26 +64,25 @@ static int handle_child_process(char *path_cmd, char **args, char **env_array)
     return 0;
 }
 
-static int handle_parent_process(char *path_cmd, char **args,
-    pid_t child_pid, char **env_array)
+static void setup_terminal_for_child(pid_t child_pid, struct sigaction *old_sa_ttou)
 {
-    int status;
-    job_t *job = NULL;
-    struct sigaction sa_ttou, old_sa_ttou;
-    job_t *added_jobs = NULL;
-
-    setpgid(child_pid, child_pid);
-    added_jobs = add_job(child_pid, args[0]);
+    struct sigaction sa_ttou;
     sa_ttou.sa_handler = SIG_IGN;
     sigemptyset(&sa_ttou.sa_mask);
     sa_ttou.sa_flags = 0;
-    sigaction(SIGTTOU, &sa_ttou, &old_sa_ttou);
-
+    sigaction(SIGTTOU, &sa_ttou, old_sa_ttou);
     tcsetpgrp(STDIN_FILENO, child_pid);
-    waitpid(child_pid, &status, WUNTRACED);
-    tcsetpgrp(STDIN_FILENO, getpgrp());
-    sigaction(SIGTTOU, &old_sa_ttou, NULL);
+}
 
+static void restore_terminal(struct sigaction *old_sa_ttou)
+{
+    tcsetpgrp(STDIN_FILENO, getpgrp());
+    sigaction(SIGTTOU, old_sa_ttou, NULL);
+}
+
+static void handle_job_status_after_wait(pid_t child_pid, int status, job_t *added_jobs, char *path_cmd, char **env_array, char **args)
+{
+    job_t *job = NULL;
     my_free(path_cmd);
     free_array(env_array);
     free_array(args);
@@ -95,6 +94,21 @@ static int handle_parent_process(char *path_cmd, char **args,
     } else {
         remove_job(added_jobs->id);
     }
+}
+
+static int handle_parent_process(char *path_cmd, char **args,
+    pid_t child_pid, char **env_array)
+{
+    int status;
+    struct sigaction old_sa_ttou;
+    job_t *added_jobs = NULL;
+
+    setpgid(child_pid, child_pid);
+    added_jobs = add_job(child_pid, args[0]);
+    setup_terminal_for_child(child_pid, &old_sa_ttou);
+    waitpid(child_pid, &status, WUNTRACED);
+    restore_terminal(&old_sa_ttou);
+    handle_job_status_after_wait(child_pid, status, added_jobs, path_cmd, env_array, args);
     return seg_exit(status);
 }
 
