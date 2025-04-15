@@ -21,12 +21,22 @@
     #include <fcntl.h>
     #include <ctype.h>
     #include <signal.h>
+    #include <time.h>
+    #include <ctype.h>
+    #include <termios.h>
 
 typedef struct alias_ll {
     char *name;
     char **value;
     struct alias_ll *next;
 } alias_ll_t;
+
+typedef struct history {
+    char *cmd;
+    int idx;
+    char *hour;
+    struct history *next;
+} history_t;
 
 typedef struct minishel_s {
     char *name;
@@ -64,6 +74,44 @@ typedef struct {
     int i;
 } parse_ctx_t;
 
+typedef struct {
+    int level_par;
+    int level_signle;
+    int level_double;
+} level_ini_t;
+
+typedef enum job_state {
+    JOB_RUNNING,
+    JOB_STOPPED,
+    JOB_DONE
+} job_state_t;
+
+typedef struct job_s {
+    int id;
+    char *command;
+    pid_t pid;
+    job_state_t state;
+    struct job_s *next;
+} job_t;
+
+char **clean_quote(char **array);
+int is_level_0(level_ini_t *level);
+void update_level(level_ini_t *level, char input);
+job_t **get_job_list(void);
+void safely_print_jobs_done(void);
+
+int background(char **args);
+void print_jobs_done(void);
+job_t *find_job_by_id(int job_id);
+void remove_job(int job_id);
+int forground(char **args);
+int print_jobs(void);
+job_t *find_job_by_pid(pid_t pid);
+job_t *add_job(pid_t pid, char *cmd);
+int handle_background(char *cmd, minishel_t **llenv);
+int execute_background(char *cmd, minishel_t **llenv);
+void update_jobs_status(void);
+
 int is_simple_sep(char c);
 int is_double_sep(char *str, int i);
 int is_pipe(char c);
@@ -83,6 +131,7 @@ int handle_unsetenv(char **args, minishel_t **llenv);
 int handle_exit(char **args, minishel_t **llenv);
 int handle_cd(char **args, minishel_t **llenv);
 int handle_variable(char **args, minishel_t **llenv);
+int handle_unset(char **args, minishel_t **llenv);
 void add_llist_env(char *pwd, minishel_t **llenv, const char *name);
 void add_llist(minishel_t **head, const char *name, char *value);
 char *my_getenv(minishel_t *head, const char *name);
@@ -96,7 +145,7 @@ int builtin_cd(char **args, minishel_t **llenv);
 int my_setenv(char **args, minishel_t **llenv);
 int handle_env_commands(char **args, minishel_t **llenv);
 void print_env(minishel_t *head);
-void get_input(char **input, int ret_status, minishel_t **llenv);
+int get_input(char **input, int ret_status, minishel_t **llenv);
 void initialize_shell(char **env, minishel_t **llenv);
 int execute_command(char *path_cmd, char **args, minishel_t **llenv);
 int main_loop(minishel_t **llenv);
@@ -123,10 +172,20 @@ char *my_strchr(const char *str, int c);
 int handle_unalias(char **args, minishel_t **llenv);
 alias_ll_t **get_ll_alias(void);
 char **globbing(char **command);
+char **my_array_dup(char **array);
+void add_history(char *args);
+int print_history(char **args, minishel_t **llenv);
+int handle_exclamation(char **args);
+char *clean_str(const char *str);
+int find_start(const char *str);
+
+void checklen(const char *str, int i, int *len, int *space);
+int get_len_exclamation(char *line);
+char *get_value_in_history(char *line, int len);
+history_t **get_history(void);
 
 //variable handling
 minishel_t **get_variable(void);
-void print_var(void);
 int handle_variable(char **args, minishel_t **llenv);
 int is_equal(char c);
 

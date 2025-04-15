@@ -109,7 +109,7 @@ static int is_parentese(char *input)
     return 0;
 }
 
-int handle_token(char *token, minishel_t **llenv)
+static int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;
@@ -118,8 +118,11 @@ int handle_token(char *token, minishel_t **llenv)
         return handle_parenthese(llenv, token);
     }
     if (my_strstr(token, "&&") != NULL)
-        status = handle_and(token, llenv);
-    else if (my_strstr(token, "||") != NULL)
+        return handle_and(token, llenv);
+    if (my_strstr(token, "&") != NULL) {
+        return handle_background(token, llenv);
+    }
+    if (my_strstr(token, "||") != NULL)
         status = handle_or(token, llenv);
     else {
         parse_token(token);
@@ -137,14 +140,4 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
         status = handle_token(all_cmd[i], llenv);
     }
     return status;
-}
-
-int len_array(char **array)
-{
-    int i = 0;
-
-    while (array[i] != NULL) {
-        i++;
-    }
-    return i;
 }

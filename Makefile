@@ -7,10 +7,10 @@
 
 NAME	 	=		42sh
 
-
-SRCS		=		$(wildcard src/*.c) $(wildcard ./lib/my/*.c) \
-					$(wildcard src/parentese_sys/*.c) \
-					$(wildcard ./lib/my_malloc/*.c)
+SRCS		=		$(wildcard src/*.c) \
+					$(wildcard ./lib/my/*.c) $(wildcard ./lib/my_malloc/*.c) \
+					$(wildcard src/jobs_control/*.c) \
+					$(wildcard src/parentese_sys/*.c)
 
 OBJS        =               $(SRCS:.c=.o)
 
@@ -42,7 +42,7 @@ clean_test		:
 
 re              :               fclean all
 
-val		:		$(OBJS)
+val		:
 			gcc -o $(NAME) $(SRCS) $(CFLAGS) -g3
 
 run 	:		re

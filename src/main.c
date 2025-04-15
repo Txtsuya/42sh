@@ -62,10 +62,18 @@ void add_llist(minishel_t **head, const char *name, char *value)
     }
 }
 
+void init_jobs(void)
+{
+    setpgid(0, 0);
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+}
+
 int main(int argc, char **argv, char **env)
 {
     minishel_t *llenv;
 
+    init_jobs();
     initialize_shell(env, &llenv);
     return main_loop(&llenv);
 }
