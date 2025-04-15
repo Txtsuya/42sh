@@ -31,6 +31,8 @@ int execute_main_cmd(char *cmd, minishel_t **llenv)
 
     check_alias(&args);
     args = globbing(args);
+    if (args == NULL)
+        return 1;
     if (handle_builtin_cmd(&args, cmd, llenv) == 1)
         return reset_redirection(0, saved_stdin, saved_stdout);
     if (parse_redirections(args) != 0)
