@@ -141,13 +141,3 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     }
     return status;
 }
-
-int len_array(char **array)
-{
-    int i = 0;
-
-    while (array[i] != NULL) {
-        i++;
-    }
-    return i;
-}
