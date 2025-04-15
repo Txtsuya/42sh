@@ -10,19 +10,21 @@
 void get_input(char **input, int ret_status, minishel_t **llenv)
 {
     size_t len = 0;
-    char *precmd_value = get_special_variable("precmd");
+    minishel_t *precmd_value = (minishel_t *)get_special_variable("precmd");
 
-    if (precmd_value && isatty(STDIN_FILENO))
-        execute_multi_cmd(llenv, precmd_value);
+    if (precmd_value && precmd_value->value && isatty(STDIN_FILENO)) {
+        printf("precmd_value->value est NULL ??? : %s\n", precmd_value->value);
+        execute_multi_cmd(llenv, precmd_value->value);
+    }
     if (isatty(STDIN_FILENO)) {
         my_putstr(my_getenv(*llenv, "PWD"));
         my_putstr(" > ");
     }
     if (getline(input, &len, stdin) == -1) {
-        if (get_special_variable("ignoreeof") != NULL
-            && isatty(STDIN_FILENO)) {
+        if (get_special_variable("ignoreeof") != NULL && isatty(STDIN_FILENO)) {
             printf("\nUse 'exit' to leave 42sh.\n");
             *input = my_strdup("");
+            clearerr(stdin);
             return;
         }
         exit(ret_status);
