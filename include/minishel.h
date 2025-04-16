@@ -78,6 +78,7 @@ typedef struct {
     int level_par;
     int level_signle;
     int level_double;
+    int level_inibitor;
 } level_ini_t;
 
 typedef enum job_state {
@@ -167,7 +168,7 @@ int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
 int check_right_argv(char *argv);
 int handle_alias(char **args, minishel_t **llenv);
 void check_alias(char ***args);
-char *extract_between_quotes(const char *str);
+char *extract_between_c(const char *str, char c);
 char *my_strchr(const char *str, int c);
 int handle_unalias(char **args, minishel_t **llenv);
 alias_ll_t **get_ll_alias(void);
@@ -177,7 +178,10 @@ void add_history(char *args);
 int print_history(char **args, minishel_t **llenv);
 int handle_exclamation(char **args);
 char *clean_str(const char *str);
+char *replace_in_array(char *dest, char *src, int idx_start, int len_last);
 int find_start(const char *str);
+int handle_back_ticks(char **line, minishel_t **llenv);
+char *get_buffer_backticks(char *cmd, minishel_t **llenv);
 
 void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
