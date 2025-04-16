@@ -11,7 +11,7 @@ static int error_command_not_found(char *path_cmd, char *args)
 {
     if (path_cmd == NULL) {
         write(2, args, strlen(args));
-        write(2, ": Command not found.\n", 21);
+        write(2, ": Command not found.\n", strlen(": Command not found.\n"));
         exit(1);
     }
     return 0;
