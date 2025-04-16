@@ -56,22 +56,46 @@ int handle_which(char *cmd, minishel_t **llenv)
     return 0;
 }
 
+static int is_two_dote(char c)
+{
+    return (c != ':');
+}
+
+static char *base_path(char *cmd)
+{
+    const char *path = "/bin/";
+    char *path_cmd = my_malloc(my_strlen(path) + my_strlen(cmd));
+
+    my_strcpy(path_cmd, path);
+    my_strcat(path_cmd, cmd);
+    return path_cmd;
+}
+
 int handle_where(char *cmd, minishel_t **llenv)
 {
-    char *path_var = my_getenv(*llenv, "PATH");
+    char *path;
+    char **path_env;
+    char *concat_path;
+    int i = 0;
 
-    path = my_getenv(*env, "PATH");
+    while (*cmd != ' ' && *cmd != '\0')
+        cmd++;
+    while (*cmd == ' ')
+        cmd++;
+    path = my_getenv(*llenv, "PATH");
     if (path == NULL)
         return base_path(cmd);
     path_env = my_str_to_word_array(path, is_two_dote);
     while (path_env[i] != NULL) {
-        path_cmd = my_malloc(my_strlen(path_env[i]) + my_strlen(path) + 1);
-        my_strcpy(path_cmd, path_env[i]);
-        my_strcat(path_cmd, "/");
-        my_strcat(path_cmd, cmd);
-        if (access(path_cmd, X_OK) == 0)
-            return free_and_return(path_cmd, path_env);
-        my_free(path_cmd);
+        concat_path = my_malloc(my_strlen(path_env[i]) + my_strlen(path) + 1);
+        my_strcpy(concat_path, path_env[i]);
+        my_strcat(concat_path, "/");
+        my_strcat(concat_path, cmd);
+        if (access(concat_path, X_OK) == 0) {
+            printf("%s\n", concat_path);
+        }
+        my_free(concat_path);
         i++;
     }
+    return 0;
 }
