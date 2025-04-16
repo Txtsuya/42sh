@@ -1,119 +1,107 @@
 /*
-** EPITECH PROJECT, 2024
-** 42sh
+** EPITECH PROJECT, 2025
+** String Cleaner
 ** File description:
-** clean_str.c
+** Functions to clean and format strings with proper spacing
 */
 
-#include "../include/minishel.h"
-#include "minishel.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
-static int find_end(const char *str, int start)
+static int is_operator(char c)
 {
-    int end = strlen(str) - 1;
-
-    while (end > start && isspace((unsigned char)str[end]))
-        end--;
-    return end;
+    return (c == '|' || c == '&' || c == '<' ||
+            c == '>' || c == ';' || c == '(' || c == ')');
 }
 
-static int is_special_char(char c)
+static int is_double_operator(const char *str, int i)
 {
-    return c == '(' || c == ')' || c == '{' || c == '}' || c == '[' ||
-        c == ']' || c == ';' || c == '|' ||
-        c == '&' || c == '<' || c == '>';
+    return ((str[i] == '&' && str[i + 1] == '&') ||
+            (str[i] == '>' && str[i + 1] == '>') ||
+            (str[i] == '<' && str[i + 1] == '<') ||
+            (str[i] == '|' && str[i + 1] == '|'));
 }
 
-static int should_add_space(const char *str, int i, int end)
+static void handle_whitespace(const char *input, char *result, int *i, int *j)
 {
-    return (i + 1 <= end &&
-        !isspace((unsigned char)str[i + 1]) &&
-        !is_special_char(str[i + 1]) && i > 0 &&
-        !is_special_char(str[i - 1]));
-}
-
-static void handle_space(const char *str, int *i, int end, int *len)
-{
-    if (should_add_space(str, *i, end))
-        (*len)++;
-    (*i)++;
-}
-
-static void handle_normal_char(int *i, int *len)
-{
-    (*len)++;
-    (*i)++;
-}
-
-static int calculate_trimmed_length(const char *str, int start, int end)
-{
-    int len = 0;
-    int i = start;
-
-    while (i <= end) {
-        if (isspace((unsigned char)str[i])) {
-            handle_space(str, &i, end, &len);
-            continue;
-        }
-        if (is_special_char(str[i])) {
-            handle_normal_char(&i, &len);
-            continue;
-        }
-        handle_normal_char(&i, &len);
+    if (*j > 0 && !isspace(result[*j - 1])) {
+        result[*j] = ' ';
+        (*j)++;
     }
-    return len;
-}
-
-static void copy_space(const char *str, int end, char *result, int *ik[2])
-{
-    if (should_add_space(str, *(ik[0]), end)) {
-        result[*(ik[1])] = ' ';
-        (*(ik[1]))++;
+    while (isspace(input[*i + 1])) {
+        (*i)++;
     }
-    (*(ik[0]))++;
 }
 
-static void copy_normal_char(const char *str, int *i, char *result, int *k)
+static void handle_double_operator(const char *input,
+    char *result, int *i, int *j)
 {
-    result[*k] = str[*i];
-    (*k)++;
+    if (*j > 0 && !isspace(result[*j - 1])) {
+        result[*j] = ' ';
+        (*j)++;
+    }
+    result[*j] = input[*i];
+    (*j)++;
     (*i)++;
-}
-
-void copy_trimmed(const char *str, int start, int end, char *result)
-{
-    int k = 0;
-    int i = start;
-
-    while (i <= end) {
-        if (isspace((unsigned char)str[i])) {
-            copy_space(str, end, result, (int *[]){&i, &k});
-            continue;
-        }
-        if (is_special_char(str[i])) {
-            copy_normal_char(str, &i, result, &k);
-            continue;
-        }
-        copy_normal_char(str, &i, result, &k);
+    result[*j] = input[*i];
+    (*j)++;
+    if (!isspace(input[*i + 1])) {
+        result[*j] = ' ';
+        (*j)++;
     }
-    result[k] = '\0';
 }
 
-char *clean_str(const char *str)
+static void handle_single_operator(const char *input,
+    char *result, int *i, int *j)
 {
-    char *result;
-    int new_len;
-    int start;
-    int end;
+    if (*j > 0 && !isspace(result[*j - 1])) {
+        result[*j] = ' ';
+        (*j)++;
+    }
+    result[*j] = input[*i];
+    (*j)++;
+    if (!isspace(input[*i + 1])) {
+        result[*j] = ' ';
+        (*j)++;
+    }
+}
 
-    if (!str)
-        return NULL;
-    start = find_start(str);
-    end = find_end(str, start);
-    new_len = calculate_trimmed_length(str, start, end);
-    result = malloc(new_len + 1);
+int if_gestion(const char *input, char *result, int *i, int *j)
+{
+    if (isspace(input[*i])) {
+        handle_whitespace(input, result, i, j);
+        return 1;
+    }
+    if (is_double_operator(input, *i)) {
+        handle_double_operator(input, result, i, j);
+        return 1;
+    }
+    if (is_operator(input[*i])) {
+        handle_single_operator(input, result, i, j);
+        return 1;
+    }
+    return 0;
+}
+
+char *clean_str(const char *input)
+{
+    int len = strlen(input);
+    char *result = malloc(len * 4 + 1);
+    int j = 0;
+    int i = 0;
+
     if (!result)
         return NULL;
-    copy_trimmed(str, start, end, result);
+    for (i = 0; i < len; i++) {
+        if (if_gestion(input, result, &i, &j))
+            continue;
+        result[j] = input[i];
+        j++;
+    }
+    if (j > 0 && isspace(result[j - 1]))
+        j = j - 1;
+    result[j] = '\0';
     return result;
 }
