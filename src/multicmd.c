@@ -12,6 +12,11 @@ static int is_separator(char c)
     return (c == ';');
 }
 
+static int is_space(char c)
+{
+    return (c != ' ' && c != '\t' && c != '\"');
+}
+
 int get_redirection_index(const char *arg)
 {
     const char *redirection_tokens[] = {">", ">>", "<", "<<", NULL};
@@ -29,14 +34,6 @@ void free_array(char **tab)
         my_free(tab[i]);
     }
     my_free(tab);
-}
-
-static int which_cmd(char *cmd, minishel_t **llenv)
-{
-    if (nbr_instr(cmd, '|'))
-        return executepipe(cmd, llenv);
-    else
-        return execute_main_cmd(cmd, llenv);
 }
 
 static int handle_and(char *cmd, minishel_t **llenv)
@@ -109,25 +106,22 @@ static int is_parentese(char *input)
     return 0;
 }
 
-static int handle_token(char *token, minishel_t **llenv)
+int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;
+    const char *cmd[] = {"repeat", "which", "&&", "&", "||", NULL};
+    int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which,
+        handle_and, handle_background, handle_or};
 
-    if (is_parentese(token)) {
+    if (is_parentese(token))
         return handle_parenthese(llenv, token);
+    for (int i = 0; cmd[i]; i++) {
+        if (my_strstr(token, cmd[i]) != NULL)
+            return handlers[i](token, llenv);
     }
-    if (my_strstr(token, "&&") != NULL)
-        return handle_and(token, llenv);
-    if (my_strstr(token, "&") != NULL) {
-        return handle_background(token, llenv);
-    }
-    if (my_strstr(token, "||") != NULL)
-        status = handle_or(token, llenv);
-    else {
-        parse_token(token);
-        status = which_cmd(token, llenv);
-    }
+    parse_token(token);
+    status = which_cmd(token, llenv);
     return status;
 }
 
@@ -136,8 +130,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
 
-    for (int i = 0; all_cmd[i] != NULL; i++) {
+    for (int i = 0; all_cmd[i] != NULL; i++)
         status = handle_token(all_cmd[i], llenv);
-    }
     return status;
 }

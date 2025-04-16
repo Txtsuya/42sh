@@ -7,6 +7,18 @@
 
 #include "../include/minishel.h"
 
+int check_type(char *type)
+{
+    const char *types[] = {"cd", "exit", "env", "alias", "unsetenv",
+        "unalias", "set", "jobs", "history", "unset", "bg", NULL};
+
+    for (int i = 0; types[i]; i++) {
+        if (my_strcmp(type, types[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 void add_llist_env(char *pwd, minishel_t **llenv, const char *name)
 {
     add_llist(llenv, name, pwd);

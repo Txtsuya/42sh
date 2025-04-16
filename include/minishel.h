@@ -184,6 +184,9 @@ int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
 
+//built-in handling
+int check_type(char *type);
+
 //variable handling
 minishel_t **get_variable(void);
 int handle_variable(char **args, minishel_t **llenv);
@@ -194,5 +197,11 @@ char *expand_variables(char *input, minishel_t **env);
 char *get_variable_name(char *input, int *i);
 minishel_t *get_special_variable(char *name);
 int handle_ignoreeof(char **input);
+
+//shell command handling
+int which_cmd(char *cmd, minishel_t **llenv);
+int handle_repeat(char *cmd, minishel_t **llenv);
+int handle_which(char *cmd, minishel_t **llenv);
+int handle_where(char *cmd, minishel_t **llenv);
 
 #endif
