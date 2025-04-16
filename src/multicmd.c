@@ -40,18 +40,13 @@ static int handle_and(char *cmd, minishel_t **llenv)
 {
     int status = 0;
     char *tkt_ptr;
-    char *token = strtok_r(cmd, "&&", &tkt_ptr);
-    int len = 0;
+    char *token;
 
+    if (validate_cmd_syntax(cmd) != 0)
+        return 1;
+    token = strtok_r(cmd, "&&", &tkt_ptr);
     while (token != NULL) {
-        while (*token == ' ')
-            token++;
-        len = my_strlen(token);
-        while (len > 0 && token[len - 1] == ' ') {
-            token[len] = '\0';
-            len--;
-        }
-        status = which_cmd(token, llenv);
+        status = process_token(token, llenv);
         if (status != 0)
             break;
         token = strtok_r(NULL, "&&", &tkt_ptr);
@@ -63,19 +58,14 @@ static int handle_or(char *cmd, minishel_t **llenv)
 {
     int status = 1;
     char *tkt_ptr;
-    char *token = strtok_r(cmd, "||", &tkt_ptr);
-    int len = 0;
+    char *token;
 
+    if (validate_cmd_syntax(cmd) != 0)
+        return 1;
+    token = strtok_r(cmd, "||", &tkt_ptr);
     while (token != NULL) {
-        while (*token == ' ')
-            token++;
-        len = my_strlen(token);
-        while (len > 0 && token[len - 1] == ' ') {
-            token[len - 1] = '\0';
-            len--;
-        }
         if (status != 0)
-            status = which_cmd(token, llenv);
+            status = process_token(token, llenv);
         if (status == 0)
             break;
         token = strtok_r(NULL, "||", &tkt_ptr);
@@ -114,6 +104,8 @@ int handle_token(char *token, minishel_t **llenv)
     int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which,
         handle_where, handle_and, handle_background, handle_or};
 
+    if (validate_cmd_syntax(token) != 0)
+        return 1;
     if (is_parentese(token))
         return handle_parenthese(llenv, token);
     for (int i = 0; cmd[i]; i++) {
@@ -130,7 +122,10 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
 
+    if (validate_cmd_syntax(input) != 0)
+        return 1;
     for (int i = 0; all_cmd[i] != NULL; i++)
         status = handle_token(all_cmd[i], llenv);
+    free_array(all_cmd);
     return status;
 }

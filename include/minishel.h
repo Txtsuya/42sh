@@ -208,4 +208,11 @@ int handle_repeat(char *cmd, minishel_t **llenv);
 int handle_which(char *cmd, minishel_t **llenv);
 int handle_where(char *cmd, minishel_t **llenv);
 
+//and or errors
+int validate_and(char *cmd);
+int validate_or(char *cmd);
+int validate_mixed(char *cmd);
+int validate_cmd_syntax(char *cmd);
+int process_token(char *token, minishel_t **llenv);
+
 #endif
