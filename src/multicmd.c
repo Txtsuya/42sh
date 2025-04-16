@@ -134,6 +134,22 @@ static int is_parentese(char *input)
     return 0;
 }
 
+static int handle_which(char *cmd, minishel_t **llenv)
+{
+    char *which_cmd = NULL;
+
+    while (*cmd != ' ' && *cmd != '\0')
+        cmd++;
+    while (*cmd == ' ')
+        cmd++;
+    which_cmd = my_strdup(cmd);
+    which_cmd = build_path_cmd(cmd, llenv);
+    if (!which_cmd)
+        return 1;
+    printf("%s\n", which_cmd);
+    return 0;
+}
+
 static int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
@@ -143,6 +159,8 @@ static int handle_token(char *token, minishel_t **llenv)
         return handle_parenthese(llenv, token);
     if (my_strstr(token, "repeat") != NULL)
         return handle_repeat(token, llenv);
+    if (my_strstr(token, "which") != NULL)
+        return handle_which(token, llenv);
     if (my_strstr(token, "&&") != NULL)
         return handle_and(token, llenv);
     if (my_strstr(token, "&") != NULL)
