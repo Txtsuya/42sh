@@ -55,14 +55,12 @@ char **get_value_alias(char *name)
 {
     alias_ll_t **head = get_ll_alias();
     alias_ll_t *current = *head;
-    char **multi = NULL;
 
     if (!name)
         return NULL;
     while (current) {
         if (my_strcmp(current->name, name) == 0) {
-            multi = get_value_alias(current->value[0]);
-            return multi ? multi : current->value;
+            return current->value;
         }
         current = current->next;
     }
@@ -89,6 +87,7 @@ void check_alias(char ***args)
     new[i] = NULL;
     free_array(*args);
     *args = new;
+    check_alias(args);
 }
 
 int handle_unalias(char **args, minishel_t **llenv)
