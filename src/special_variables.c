@@ -71,7 +71,7 @@ char *get_variable_name(char *input, int *i)
         j++;
         pos++;
     }
-    *i = pos;
+    *i = pos - 1;
     if (j == 0) {
         return NULL;
     }
@@ -87,12 +87,13 @@ char *concat_result(char *result, char *value, int *j)
         result[*j] = value[k];
         (*j)++;
     }
+    result[*j] = '\0';
     return result;
 }
 
 char *expand_variables(char *input, minishel_t **env)
 {
-    char *result = my_malloc(sizeof(char) * (my_strlen(input) * 2 + 1));
+    char *result = my_malloc(sizeof(char) * (my_strlen(input) + PATH_MAX + 1));
     char *var = NULL;
     char *value = NULL;
     int i = 0;
@@ -106,10 +107,10 @@ char *expand_variables(char *input, minishel_t **env)
             value = get_expand_variables(env, var);
             result = concat_result(result, value, &j);
         } else {
-                result[j] = input[i];
-                j++;
+            result[j] = input[i];
+            j++;
+            result[j] = '\0';
         }
-        result[j] = '\0';
     }
     return result;
 }

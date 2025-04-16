@@ -134,6 +134,18 @@ static int is_parentese(char *input)
     return 0;
 }
 
+int check_type(char *type)
+{
+    const char *types[] = {"cd", "exit", "env", "alias", "unsetenv",
+        "unalias", "set", "jobs", "history", "unset", "bg"};
+
+    for (int i = 0; types[i]; i++) {
+        if (my_strcmp(type, types[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 static int handle_which(char *cmd, minishel_t **llenv)
 {
     char *which_cmd = NULL;
@@ -144,8 +156,11 @@ static int handle_which(char *cmd, minishel_t **llenv)
         cmd++;
     which_cmd = my_strdup(cmd);
     which_cmd = build_path_cmd(cmd, llenv);
-    if (!which_cmd)
+    if (!which_cmd) {
+        if (check_type(cmd) == 1)
+            printf("%s: shell built-in command.\n", cmd);
         return 1;
+    }
     printf("%s\n", which_cmd);
     return 0;
 }
