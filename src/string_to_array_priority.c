@@ -6,6 +6,16 @@
 */
 #include "../include/minishel.h"
 
+static void update_ini(level_ini_t *level, char input)
+{
+    if (input == '`') {
+        if (level->level_inibitor == 1)
+            level->level_inibitor -= 1;
+        else
+            level->level_inibitor += 1;
+    }
+}
+
 void update_level(level_ini_t *level, char input)
 {
     if (input == '(')
@@ -24,13 +34,15 @@ void update_level(level_ini_t *level, char input)
         else
             level->level_double += 1;
     }
+    update_ini(level, input);
 }
 
 int is_level_0(level_ini_t *level)
 {
     if (level->level_par == 0 &&
         level->level_double == 0 &&
-        level->level_signle == 0) {
+        level->level_signle == 0 &&
+        level->level_inibitor == 0) {
             return 1;
     } else {
         return 0;

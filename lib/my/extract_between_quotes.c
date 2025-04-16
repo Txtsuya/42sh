@@ -7,18 +7,18 @@
 
 #include "../../include/minishel.h"
 
-char *extract_between_quotes(const char *str)
+char *extract_between_c(const char *str, char c)
 {
     const char *start;
     const char *end;
     char *result;
     int length;
 
-    start = my_strchr(str, '"');
+    start = my_strchr(str, c);
     if (start == NULL)
         return NULL;
     start++;
-    end = my_strchr(start, '"');
+    end = my_strchr(start, c);
     if (end == NULL)
         return NULL;
     length = end - start;
