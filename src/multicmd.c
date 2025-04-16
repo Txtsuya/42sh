@@ -150,26 +150,41 @@ static int handle_which(char *cmd, minishel_t **llenv)
     return 0;
 }
 
+static int handle_where(char *cmd, minishel_t **llenv)
+{
+    
+}
+
 static int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;
+    const char *cmd[] = {"repeat", "which", "where", "&&", "&", "||", NULL};
+    int (*handler_func[])(char *, minishel_t **) ={handle_repeat, handle_which,
+        handle_where, handle_and, handle_background, handle_or};
 
     if (is_parentese(token))
         return handle_parenthese(llenv, token);
-    if (my_strstr(token, "repeat") != NULL)
-        return handle_repeat(token, llenv);
-    if (my_strstr(token, "which") != NULL)
-        return handle_which(token, llenv);
-    if (my_strstr(token, "&&") != NULL)
-        return handle_and(token, llenv);
-    if (my_strstr(token, "&") != NULL)
-        return handle_background(token, llenv);
-    if (my_strstr(token, "||") != NULL)
-        status = handle_or(token, llenv);
-    else {
-        parse_token(token);
-        status = which_cmd(token, llenv);
+    // if (my_strstr(token, "repeat") != NULL)
+    //     return handle_repeat(token, llenv);
+    // if (my_strstr(token, "which") != NULL)
+    //     return handle_which(token, llenv);
+    // if (my_strstr(token, "where") != NULL)
+    //     return handle_where(token, llenv);
+    // if (my_strstr(token, "&&") != NULL)
+    //     return handle_and(token, llenv);
+    // if (my_strstr(token, "&") != NULL)
+    //     return handle_background(token, llenv);
+    // if (my_strstr(token, "||") != NULL)
+    //     status = handle_or(token, llenv);
+    for (int i = 0; cmd[i]; i++) {
+        if (my_strcmp(token, cmd[i]) == 0) {
+            handler_func[i](token, llenv);
+            return 1;
+        } else {
+            parse_token(token);
+            status = which_cmd(token, llenv);
+        }
     }
     return status;
 }
@@ -179,8 +194,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
 
-    for (int i = 0; all_cmd[i] != NULL; i++) {
+    for (int i = 0; all_cmd[i] != NULL; i++)
         status = handle_token(all_cmd[i], llenv);
-    }
     return status;
 }
