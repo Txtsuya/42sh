@@ -17,20 +17,31 @@ static int check_valide_output(char *line)
     return 1;
 }
 
+int process_ignoreeof(char **input, size_t len, int ret_status)
+{
+    if (getline(input, &len, stdin) == -1) {
+        if (handle_ignoreeof(input) == 0)
+            return 1;
+        exit(ret_status);
+    }
+    return 84;
+}
+
 int get_input(char **input, int ret_status, minishel_t **llenv)
 {
     size_t len = 0;
+    minishel_t *precmd_value = (minishel_t *)get_special_variable("precmd");
 
+    if (precmd_value && precmd_value->value && isatty(STDIN_FILENO))
+        execute_multi_cmd(llenv, precmd_value->value);
     if (isatty(STDIN_FILENO)) {
         my_putstr(my_getenv(*llenv, "PWD"));
         my_putstr(" > ");
     }
-    if (getline(input, &len, stdin) == -1) {
-        exit(ret_status);
-    }
-    if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n') {
+    if (process_ignoreeof(input, len, ret_status) == 1)
+        return 1;
+    if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n')
         (*input)[my_strlen(*input) - 1] = '\0';
-    }
     if (check_valide_output(*input))
         return 1;
     *input = clean_str(*input);
