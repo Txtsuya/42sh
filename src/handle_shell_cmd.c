@@ -44,17 +44,14 @@ int handle_which(char *cmd, minishel_t **llenv)
     while (*cmd == ' ')
         cmd++;
     which_cmd = my_strdup(cmd);
-    which_cmd = build_path_cmd(cmd, llenv);
-    if (!which_cmd) {
-        if (check_type(cmd) == 1) {
-            printf("%s: shell built-in command.\n", cmd);
-            return 1;
-        } else {
-            write(2, cmd, strlen(cmd));
-            write(2, ": Command not found.\n", 22);
-        }
-        return 1;
+    if (check_is_builtin(cmd) == 1)
+        printf("%s: shell built-in command.\n", cmd);
+    else {
+        which_cmd = build_path_cmd(cmd, llenv);
+        if (which_cmd)
+            printf("%s\n", which_cmd);
+        else
+            printf("%s: Command not found.\n", cmd);
     }
-    printf("%s\n", which_cmd);
     return 0;
 }

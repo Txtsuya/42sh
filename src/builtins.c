@@ -7,10 +7,10 @@
 
 #include "../include/minishel.h"
 
-int check_type(char *type)
+int check_is_builtin(char *type)
 {
     const char *types[] = {"cd", "exit", "env", "alias", "unsetenv",
-        "unalias", "set", "jobs", "history", "unset", "bg", NULL};
+        "unalias", "set", "jobs", "history", "unset", "bg", "echo", NULL};
 
     for (int i = 0; types[i]; i++) {
         if (my_strcmp(type, types[i]) == 0)
