@@ -57,12 +57,12 @@ int handle_which(char *cmd, minishel_t **llenv)
     return 0;
 }
 
-static int is_two_dote(char c)
+int is_two_dote(char c)
 {
     return (c != ':');
 }
 
-void my_concat_path(char *concat_path, char **path_env, int i, char *cmd)
+static void my_concat_path(char *concat_path, char **path_env, int i, char *cmd)
 {
     my_strcpy(concat_path, path_env[i]);
     my_strcat(concat_path, "/");
