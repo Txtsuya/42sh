@@ -55,12 +55,14 @@ char **get_value_alias(char *name)
 {
     alias_ll_t **head = get_ll_alias();
     alias_ll_t *current = *head;
+    char **multi = NULL;
 
     if (!name)
         return NULL;
     while (current) {
         if (my_strcmp(current->name, name) == 0) {
-            return current->value;
+            multi = get_value_alias(current->value[0]);
+            return multi ? multi : current->value;
         }
         current = current->next;
     }
