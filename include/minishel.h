@@ -185,7 +185,7 @@ char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
 
 //built-in handling
-int check_type(char *type);
+int check_is_builtin(char *type);
 
 //variable handling
 minishel_t **get_variable(void);
