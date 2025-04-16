@@ -104,7 +104,7 @@ int handle_token(char *token, minishel_t **llenv)
     int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which,
         handle_and, handle_background, handle_or};
 
-    if (validate_command_syntax(token) != 0)
+    if (validate_cmd_syntax(token) != 0)
         return 1;
     if (is_parentese(token))
         return handle_parenthese(llenv, token);
@@ -122,7 +122,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
 
-    if (validate_command_syntax(input) != 0)
+    if (validate_cmd_syntax(input) != 0)
         return 1;
     for (int i = 0; all_cmd[i] != NULL; i++)
         status = handle_token(all_cmd[i], llenv);
