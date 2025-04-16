@@ -110,9 +110,9 @@ int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;
-    const char *cmd[] = {"repeat", "which", "&&", "&", "||", NULL};
+    const char *cmd[] = {"repeat", "which", "where", "&&", "&", "||", NULL};
     int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which,
-        handle_and, handle_background, handle_or};
+        handle_where, handle_and, handle_background, handle_or};
 
     if (is_parentese(token))
         return handle_parenthese(llenv, token);
