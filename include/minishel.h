@@ -187,6 +187,7 @@ void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
+int is_two_dote(char c);
 
 //built-in handling
 int check_is_builtin(char *type);
@@ -206,7 +207,7 @@ int handle_ignoreeof(char **input);
 int which_cmd(char *cmd, minishel_t **llenv);
 int handle_repeat(char *cmd, minishel_t **llenv);
 int handle_which(char *cmd, minishel_t **llenv);
-int handle_where(char *cmd, minishel_t **llenv);
+int handle_where(char **args, minishel_t **llenv);
 
 //and or errors
 int validate_and(char *cmd);
