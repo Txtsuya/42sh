@@ -36,14 +36,6 @@ void free_array(char **tab)
     my_free(tab);
 }
 
-static int which_cmd(char *cmd, minishel_t **llenv)
-{
-    if (nbr_instr(cmd, '|'))
-        return executepipe(cmd, llenv);
-    else
-        return execute_main_cmd(cmd, llenv);
-}
-
 static int handle_and(char *cmd, minishel_t **llenv)
 {
     int status = 0;
@@ -91,26 +83,6 @@ static int handle_or(char *cmd, minishel_t **llenv)
     return status;
 }
 
-static int handle_repeat(char *cmd, minishel_t **llenv)
-{
-    int nb_repeat = 0;
-    char *repeat_cmd = NULL;
-
-    while (*cmd != ' ' && *cmd != '\0')
-        cmd++;
-    while (*cmd == ' ')
-        cmd++;
-    nb_repeat = atoi(cmd);
-    while (*cmd != ' ' && *cmd != '\0')
-        cmd++;
-    while (*cmd == ' ')
-        cmd++;
-    repeat_cmd = my_strdup(cmd);
-    for (int i = 0; i < nb_repeat; i++)
-        which_cmd(repeat_cmd, llenv);
-    return 0;
-}
-
 static void parse_token(char *token)
 {
     int len = my_strlen(token);
@@ -134,49 +106,13 @@ static int is_parentese(char *input)
     return 0;
 }
 
-int check_type(char *type)
-{
-    const char *types[] = {"cd", "exit", "env", "alias", "unsetenv",
-        "unalias", "set", "jobs", "history", "unset", "bg"};
-
-    for (int i = 0; types[i]; i++) {
-        if (my_strcmp(type, types[i]) == 0)
-            return 1;
-    }
-    return 0;
-}
-
-static int handle_which(char *cmd, minishel_t **llenv)
-{
-    char *which_cmd = NULL;
-
-    while (*cmd != ' ' && *cmd != '\0')
-        cmd++;
-    while (*cmd == ' ')
-        cmd++;
-    which_cmd = my_strdup(cmd);
-    which_cmd = build_path_cmd(cmd, llenv);
-    if (!which_cmd) {
-        if (check_type(cmd) == 1)
-            printf("%s: shell built-in command.\n", cmd);
-        return 1;
-    }
-    printf("%s\n", which_cmd);
-    return 0;
-}
-
-static int handle_where(char *cmd, minishel_t **llenv)
-{
-    
-}
-
-static int handle_token(char *token, minishel_t **llenv)
+int handle_token(char *token, minishel_t **llenv)
 {
     int status = 0;
     int len = 0;
-    const char *cmd[] = {"repeat", "which", "where", "&&", "&", "||", NULL};
+    const char *cmd[] = {"repeat", "which", "&&", "&", "||", NULL};
     int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which,
-        handle_where, handle_and, handle_background, handle_or};
+        handle_and, handle_background, handle_or};
 
     if (is_parentese(token))
         return handle_parenthese(llenv, token);
