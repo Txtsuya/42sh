@@ -206,7 +206,7 @@ int handle_ignoreeof(char **input);
 int which_cmd(char *cmd, minishel_t **llenv);
 int handle_repeat(char *cmd, minishel_t **llenv);
 int handle_which(char *cmd, minishel_t **llenv);
-int handle_where(char *cmd, minishel_t **llenv);
+int handle_where(char **args, minishel_t **llenv);
 
 //and or errors
 int validate_and(char *cmd);

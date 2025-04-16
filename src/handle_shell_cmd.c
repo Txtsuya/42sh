@@ -6,6 +6,7 @@
 */
 
 #include "../include/minishel.h"
+#include "minishel.h"
 
 int which_cmd(char *cmd, minishel_t **llenv)
 {
@@ -61,41 +62,45 @@ static int is_two_dote(char c)
     return (c != ':');
 }
 
-static char *base_path(char *cmd)
+void my_concat_path(char *concat_path, char **path_env, int i, char *cmd)
 {
-    const char *path = "/bin/";
-    char *path_cmd = my_malloc(my_strlen(path) + my_strlen(cmd));
-
-    my_strcpy(path_cmd, path);
-    my_strcat(path_cmd, cmd);
-    return path_cmd;
+    my_strcpy(concat_path, path_env[i]);
+    my_strcat(concat_path, "/");
+    my_strcat(concat_path, cmd);
 }
 
-int handle_where(char *cmd, minishel_t **llenv)
+static void print_command_paths(char **path_env, char *cmd)
+{
+    char *concat_path;
+    int i = 0;
+
+    while (path_env[i] != NULL) {
+        concat_path = my_malloc(my_strlen(path_env[i]) + my_strlen(cmd) + 2);
+        my_concat_path(concat_path, path_env, i, cmd);
+        if (access(concat_path, X_OK) == 0)
+            printf("%s\n", concat_path);
+        my_free(concat_path);
+        i++;
+    }
+}
+
+int handle_where(char **args, minishel_t **llenv)
 {
     char *path;
     char **path_env;
     char *concat_path;
     int i = 0;
+    int len_args = len_array(args);
 
-    while (*cmd != ' ' && *cmd != '\0')
-        cmd++;
-    while (*cmd == ' ')
-        cmd++;
     path = my_getenv(*llenv, "PATH");
     if (path == NULL)
-        return base_path(cmd);
+        path = "/bin";
     path_env = my_str_to_word_array(path, is_two_dote);
-    while (path_env[i] != NULL) {
-        concat_path = my_malloc(my_strlen(path_env[i]) + my_strlen(path) + 1);
-        my_strcpy(concat_path, path_env[i]);
-        my_strcat(concat_path, "/");
-        my_strcat(concat_path, cmd);
-        if (access(concat_path, X_OK) == 0) {
-            printf("%s\n", concat_path);
-        }
-        my_free(concat_path);
-        i++;
+    if (len_args == 1) {
+        fprintf(stderr, "where: Too few arguments.\n");
+        return 1;
     }
-    return 0;
+    for (int i = 1; args[i]; i++)
+        print_command_paths(path_env, args[i]);
+    return 1;
 }
