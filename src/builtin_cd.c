@@ -34,6 +34,7 @@ int builtin_cd(char **args, minishel_t **llenv)
 {
     char current_path[PATH_MAX];
     char *new_pwd;
+    minishel_t *cwdcmd_value;
 
     getcwd(current_path, PATH_MAX);
     if (args[1] != NULL)
@@ -47,5 +48,8 @@ int builtin_cd(char **args, minishel_t **llenv)
         return 1;
     }
     update_cd_env(current_path, llenv);
+    cwdcmd_value = (minishel_t *)get_special_variable("cwdcmd");
+    if (cwdcmd_value && cwdcmd_value->value && isatty(STDIN_FILENO))
+        execute_multi_cmd(llenv, cwdcmd_value->value);
     return 1;
 }

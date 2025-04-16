@@ -24,7 +24,8 @@ int reset_redirection(int value_ret, int saved_stdin, int saved_stdout)
 int execute_main_cmd(char *cmd, minishel_t **llenv)
 {
     char *path_cmd;
-    char **args = my_str_to_word_array(cmd, is_space);
+    char *expanded_cmd = expand_variables(cmd, llenv);
+    char **args = my_str_to_word_array(expanded_cmd, is_space);
     int saved_stdin = dup(STDIN_FILENO);
     int saved_stdout = dup(STDOUT_FILENO);
     int ret;

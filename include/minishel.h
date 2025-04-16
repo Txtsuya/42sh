@@ -19,6 +19,7 @@
     #include <limits.h>
     #include <errno.h>
     #include <fcntl.h>
+    #include <ctype.h>
     #include <signal.h>
     #include <time.h>
     #include <ctype.h>
@@ -182,5 +183,16 @@ void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
+
+//variable handling
+minishel_t **get_variable(void);
+int handle_variable(char **args, minishel_t **llenv);
+int is_equal(char c);
+
+//special variable handling
+char *expand_variables(char *input, minishel_t **env);
+char *get_variable_name(char *input, int *i);
+minishel_t *get_special_variable(char *name);
+int handle_ignoreeof(char **input);
 
 #endif
