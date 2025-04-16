@@ -89,7 +89,7 @@ void update_jobs_status(void)
     }
 }
 
-int print_jobs(void)
+int print_jobs(char **args, minishel_t **llenv)
 {
     job_t **jobs = get_job_list();
     job_t *current = *jobs;

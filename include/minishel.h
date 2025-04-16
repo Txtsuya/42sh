@@ -100,12 +100,12 @@ void update_level(level_ini_t *level, char input);
 job_t **get_job_list(void);
 void safely_print_jobs_done(void);
 
-int background(char **args);
+int background(char **args, minishel_t **llenv);
 void print_jobs_done(void);
 job_t *find_job_by_id(int job_id);
 void remove_job(int job_id);
-int forground(char **args);
-int print_jobs(void);
+int forground(char **args, minishel_t **llenv);
+int print_jobs(char **args, minishel_t **llenv);
 job_t *find_job_by_pid(pid_t pid);
 job_t *add_job(pid_t pid, char *cmd);
 int handle_background(char *cmd, minishel_t **llenv);
