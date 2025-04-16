@@ -12,6 +12,11 @@ static int is_separator(char c)
     return (c == ';');
 }
 
+static int is_space(char c)
+{
+    return (c != ' ' && c != '\t' && c != '\"');
+}
+
 int get_redirection_index(const char *arg)
 {
     const char *redirection_tokens[] = {">", ">>", "<", "<<", NULL};
@@ -86,6 +91,26 @@ static int handle_or(char *cmd, minishel_t **llenv)
     return status;
 }
 
+static int handle_repeat(char *cmd, minishel_t **llenv)
+{
+    int nb_repeat = 0;
+    char *repeat_cmd = NULL;
+
+    while (*cmd != ' ' && *cmd != '\0')
+        cmd++;
+    while (*cmd == ' ')
+        cmd++;
+    nb_repeat = atoi(cmd);
+    while (*cmd != ' ' && *cmd != '\0')
+        cmd++;
+    while (*cmd == ' ')
+        cmd++;
+    repeat_cmd = my_strdup(cmd);
+    for (int i = 0; i < nb_repeat; i++)
+        which_cmd(repeat_cmd, llenv);
+    return 0;
+}
+
 static void parse_token(char *token)
 {
     int len = my_strlen(token);
@@ -114,14 +139,14 @@ static int handle_token(char *token, minishel_t **llenv)
     int status = 0;
     int len = 0;
 
-    if (is_parentese(token)) {
+    if (is_parentese(token))
         return handle_parenthese(llenv, token);
-    }
+    if (my_strstr(token, "repeat") != NULL)
+        return handle_repeat(token, llenv);
     if (my_strstr(token, "&&") != NULL)
         return handle_and(token, llenv);
-    if (my_strstr(token, "&") != NULL) {
+    if (my_strstr(token, "&") != NULL)
         return handle_background(token, llenv);
-    }
     if (my_strstr(token, "||") != NULL)
         status = handle_or(token, llenv);
     else {
