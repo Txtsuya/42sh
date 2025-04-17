@@ -52,6 +52,8 @@ static char *get_expand_variables(minishel_t **env, char *name)
         return my_getenv(*env, "TERM");
     if (my_strcmp(name, "cwd") == 0)
         return get_cwd(env);
+    if (check_variable(name, env) == NULL)
+        return my_getenv(*env, name);
     return NULL;
 }
 
@@ -88,9 +90,24 @@ char *concat_result(char *result, char *value, int *j)
     return result;
 }
 
+static void manage_variable_value(int *j, char *result, minishel_t **env,
+    char *var)
+{
+    char *value = NULL;
+
+    if (var) {
+        value = get_expand_variables(env, var);
+        result = concat_result(result, value, &j);
+    } else {
+        result[*j] = '$';
+        (*j)++;
+    }
+    result[*j] = '\0';
+}
+
 char *expand_variables(char *input, minishel_t **env)
 {
-    char *result = my_malloc(sizeof(char) * (my_strlen(input) + PATH_MAX + 1));
+    char *result = my_malloc(sizeof(char) * (my_strlen(input) * 2 + PATH_MAX + 1));
     char *var = NULL;
     char *value = NULL;
     int i = 0;
@@ -101,8 +118,7 @@ char *expand_variables(char *input, minishel_t **env)
         if (input[i] == '$') {
             i++;
             var = get_variable_name(input, &i);
-            value = get_expand_variables(env, var);
-            result = concat_result(result, value, &j);
+            manage_variable_value(&j, result, env, var);
         } else {
             result[j] = input[i];
             j++;
