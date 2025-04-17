@@ -7,6 +7,13 @@
 
 #include "../include/minishel.h"
 
+static char *process_expvar_backticks(char *cmd, minishel_t **llenv)
+{
+    handle_back_ticks(&cmd, llenv);
+    cmd = expand_variables(cmd, llenv);
+    return cmd;
+}
+
 static int is_space(char c)
 {
     return (c != ' ' && c != '\t' && c != '\"' && c != '\n');
@@ -29,7 +36,7 @@ int execute_main_cmd(char *cmd, minishel_t **llenv)
     int saved_stdout = dup(STDOUT_FILENO);
     int ret;
 
-    handle_back_ticks(&cmd, llenv);
+    cmd = process_expvar_backticks(cmd, llenv);
     args = my_str_to_word_array(cmd, is_space);
     check_alias(&args);
     args = globbing(args);

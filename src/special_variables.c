@@ -51,6 +51,8 @@ minishel_t *get_special_variable(char *name)
 
 static char *get_expand_variables(minishel_t **env, char *name)
 {
+    minishel_t *var = get_special_variable(name);
+
     if (my_strcmp(name, "term") == 0)
         return get_term(env, name);
     if (my_strcmp(name, "cwd") == 0)
