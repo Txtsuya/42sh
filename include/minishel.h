@@ -44,6 +44,10 @@ typedef struct minishel_s {
     struct minishel_s *next;
 } minishel_t;
 
+typedef struct error_s {
+    int error_cd;
+} error_t;
+
 typedef struct command_s {
     char *name;
     int (*handler)(char **args, minishel_t **llenv);

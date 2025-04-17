@@ -75,6 +75,7 @@ int main_loop(minishel_t **llenv)
 {
     char *input = NULL;
     int status = 0;
+    error_t *err;
 
     while (1) {
         update_jobs_status();

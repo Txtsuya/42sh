@@ -7,6 +7,13 @@
 
 #include "../include/minishel.h"
 
+error_t *get_error(void)
+{
+    static error_t error;
+
+    return &error;
+}
+
 void update_cd_env(char *current, minishel_t **llenv)
 {
     char new_pwd[PATH_MAX];
@@ -28,6 +35,7 @@ void cd_error(char *path)
     }
     my_putstr(strerror(errno));
     my_putstr(".\n");
+    get_error()->error_cd = 2;
 }
 
 int builtin_cd(char **args, minishel_t **llenv)
