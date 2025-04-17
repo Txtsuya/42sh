@@ -41,12 +41,17 @@ static int handle_and(char *cmd, minishel_t **llenv)
     int status = 0;
     char *tkt_ptr;
     char *token;
+    error_t *err = get_error();
 
     if (validate_cmd_syntax(cmd) != 0)
         return 1;
     token = strtok_r(cmd, "&&", &tkt_ptr);
     while (token != NULL) {
         status = process_token(token, llenv);
+        if (err->error_cd == 2) {
+            status = 1;
+            break;
+        }
         if (status != 0)
             break;
         token = strtok_r(NULL, "&&", &tkt_ptr);
@@ -59,14 +64,17 @@ static int handle_or(char *cmd, minishel_t **llenv)
     int status = 1;
     char *tkt_ptr;
     char *token;
+    error_t *err = get_error();
 
     if (validate_cmd_syntax(cmd) != 0)
         return 1;
     token = strtok_r(cmd, "||", &tkt_ptr);
     while (token != NULL) {
-        if (status != 0)
-            status = process_token(token, llenv);
-        if (status == 0)
+        err->error_cd = 0;
+        status = process_token(token, llenv);
+        if (err->error_cd == 2)
+            status = 1;
+        if (status == 0 && err->error_cd != 2)
             break;
         token = strtok_r(NULL, "||", &tkt_ptr);
     }

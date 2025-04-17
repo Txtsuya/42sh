@@ -62,7 +62,8 @@ int is_two_dote(char c)
     return (c != ':');
 }
 
-static void my_concat_path(char *concat_path, char **path_env, int i, char *cmd)
+static void my_concat_path(char *concat_path,
+    char **path_env, int i, char *cmd)
 {
     my_strcpy(concat_path, path_env[i]);
     my_strcat(concat_path, "/");
