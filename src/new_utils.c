@@ -34,10 +34,7 @@ int get_input(char **input, int ret_status, minishel_t **llenv)
 
     if (precmd_value && precmd_value->value && isatty(STDIN_FILENO))
         execute_multi_cmd(llenv, precmd_value->value);
-    if (isatty(STDIN_FILENO)) {
-        my_putstr(my_getenv(*llenv, "PWD"));
-        my_putstr(" > ");
-    }
+    print_prompt(llenv);
     if (process_ignoreeof(input, len, ret_status) == 1)
         return 1;
     if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n')
