@@ -32,7 +32,7 @@ int handle_repeat(char *cmd, minishel_t **llenv)
         cmd++;
     repeat_cmd = my_strdup(cmd);
     for (int i = 0; i < nb_repeat; i++)
-        which_cmd(repeat_cmd, llenv);
+        execute_multi_cmd(llenv, repeat_cmd);
     return 0;
 }
 
