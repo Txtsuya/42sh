@@ -97,7 +97,8 @@ static void manage_variable_value(int *j, char *result, minishel_t **env,
 
     if (var) {
         value = get_expand_variables(env, var);
-        result = concat_result(result, value, &j);
+        result = concat_result(result, value, j);
+        my_free(var);
     } else {
         result[*j] = '$';
         (*j)++;
