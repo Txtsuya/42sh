@@ -1,0 +1,8 @@
+alias "lsl=ls -la"
+
+alias "a=ls -l"
+
+color "YELLOW WHITE BLUE BRIGHT_CYAN"
+
+alias "c=clear"
+

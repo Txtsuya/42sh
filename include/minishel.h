@@ -15,6 +15,7 @@
     #include <string.h>
     #include "my.h"
     #include "my_malloc.h"
+    #include "bonus.h"
     #include <sys/wait.h>
     #include <limits.h>
     #include <errno.h>
@@ -186,12 +187,17 @@ char *replace_in_array(char *dest, char *src, int idx_start, int len_last);
 int find_start(const char *str);
 int handle_back_ticks(char **line, minishel_t **llenv);
 char *get_buffer_backticks(char *cmd, minishel_t **llenv);
+void init_jobs(void);
+void add_alias(char *line);
+void init_color(char *line);
+int handle_color(char **list, minishel_t **llenv);
 
 void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
 int is_two_dote(char c);
+void print_prompt(minishel_t **llenv);
 
 //built-in handling
 int check_is_builtin(char *type);
