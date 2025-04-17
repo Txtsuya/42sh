@@ -63,18 +63,18 @@ char *get_variable_name(char *input, int *i)
     int pos = *i;
     int j = 0;
 
-    while (input[pos] != '\0' && (input[pos] == '_' || isalnum(input[pos]))) {
-        if (j == 0)
-            var = my_malloc(sizeof(char) * (my_strlen(input) + 1));
-        var[j] = input[pos];
-        j++;
-        pos++;
-    }
-    *i = pos - 1;
-    if (j == 0) {
+    if (input[pos] != '\0' && (input[pos] == '_' || isalnum(input[pos]))) {
+        var = my_malloc(sizeof(char) * (my_strlen(input) + 1));
+        while (input[pos] != '\0' &&
+            (input[pos] == '_' || isalnum(input[pos]))) {
+            var[j] = input[pos];
+            j++;
+            pos++;
+        }
+        var[j] = '\0';
+        *i = pos - 1;
+    } else
         return NULL;
-    }
-    var[j] = '\0';
     return var;
 }
 
