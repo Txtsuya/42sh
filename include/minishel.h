@@ -206,12 +206,13 @@ int check_is_builtin(char *type);
 minishel_t **get_variable(void);
 int handle_variable(char **args, minishel_t **llenv);
 int is_equal(char c);
+char *check_variable(char *name, minishel_t **env);
 
 //special variable handling
 char *expand_variables(char *input, minishel_t **env);
 char *get_variable_name(char *input, int *i);
-minishel_t *get_special_variable(char *name);
-int handle_ignoreeof(char **input);
+minishel_t *get_special_variable(char *name, minishel_t **env);
+int handle_ignoreeof(char **input, minishel_t **env);
 
 //shell command handling
 int which_cmd(char *cmd, minishel_t **llenv);

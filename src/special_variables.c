@@ -7,11 +7,6 @@
 
 #include "../include/minishel.h"
 
-static char *get_term(minishel_t **env, char *name)
-{
-    return my_getenv(*env, "TERM");
-}
-
 static char *get_cwd(minishel_t **env)
 {
     static char cwd_var[PATH_MAX];
@@ -21,9 +16,9 @@ static char *get_cwd(minishel_t **env)
     return my_getenv(*env, "PWD");
 }
 
-int handle_ignoreeof(char **input)
+int handle_ignoreeof(char **input, minishel_t **env)
 {
-    if (get_special_variable("ignoreeof") != NULL
+    if (get_special_variable("ignoreeof", env) != NULL
         && isatty(STDIN_FILENO)) {
         printf("\nUse 'exit' to leave 42sh.\n");
         *input = my_strdup("");
@@ -33,7 +28,7 @@ int handle_ignoreeof(char **input)
     return 84;
 }
 
-minishel_t *get_special_variable(char *name)
+minishel_t *get_special_variable(char *name, minishel_t **env)
 {
     minishel_t **var = get_variable();
     minishel_t *current;
@@ -51,10 +46,10 @@ minishel_t *get_special_variable(char *name)
 
 static char *get_expand_variables(minishel_t **env, char *name)
 {
-    minishel_t *var = get_special_variable(name);
+    minishel_t *var = get_special_variable(name, env);
 
     if (my_strcmp(name, "term") == 0)
-        return get_term(env, name);
+        return my_getenv(*env, "TERM");
     if (my_strcmp(name, "cwd") == 0)
         return get_cwd(env);
     return NULL;

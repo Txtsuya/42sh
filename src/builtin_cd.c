@@ -58,7 +58,7 @@ int builtin_cd(char **args, minishel_t **llenv)
         return 1;
     }
     update_cd_env(current_path, llenv);
-    cwdcmd_value = (minishel_t *)get_special_variable("cwdcmd");
+    cwdcmd_value = (minishel_t *)get_special_variable("cwdcmd", llenv);
     if (cwdcmd_value && cwdcmd_value->value && isatty(STDIN_FILENO))
         execute_multi_cmd(llenv, cwdcmd_value->value);
     return 1;
