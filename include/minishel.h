@@ -44,6 +44,10 @@ typedef struct minishel_s {
     struct minishel_s *next;
 } minishel_t;
 
+typedef struct error_s {
+    int error_cd;
+} error_t;
+
 typedef struct command_s {
     char *name;
     int (*handler)(char **args, minishel_t **llenv);
@@ -215,5 +219,8 @@ int validate_or(char *cmd);
 int validate_mixed(char *cmd);
 int validate_cmd_syntax(char *cmd);
 int process_token(char *token, minishel_t **llenv);
+
+//builtins error
+error_t *get_error(void);
 
 #endif
