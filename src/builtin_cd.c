@@ -26,6 +26,8 @@ void update_cd_env(char *current, minishel_t **llenv)
 
 void cd_error(char *path)
 {
+    error_t *err = get_error();
+
     if (path == NULL)
         my_putstr("cd: ");
     else {
@@ -35,7 +37,7 @@ void cd_error(char *path)
     }
     my_putstr(strerror(errno));
     my_putstr(".\n");
-    get_error()->error_cd = 2;
+    err->error_cd = 2;
 }
 
 int builtin_cd(char **args, minishel_t **llenv)
