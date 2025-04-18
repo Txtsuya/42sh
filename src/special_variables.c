@@ -44,7 +44,7 @@ minishel_t *get_special_variable(char *name, minishel_t **env)
     return NULL;
 }
 
-static char *get_expand_variables(minishel_t **env, char *name)
+char *get_expand_variables(minishel_t **env, char *name)
 {
     minishel_t *var = get_special_variable(name, env);
     char *value = NULL;
@@ -57,55 +57,6 @@ static char *get_expand_variables(minishel_t **env, char *name)
     if (value)
         return value;
     return my_getenv(*env, name);
-}
-
-char *get_variable_name(char *input, int *i)
-{
-    char *var = NULL;
-    int pos = *i;
-    int j = 0;
-
-    if (input[pos] != '\0' && (input[pos] == '_' || isalnum(input[pos]))) {
-        var = my_malloc(sizeof(char) * (my_strlen(input) + 1));
-        while (input[pos] != '\0' &&
-            (input[pos] == '_' || isalnum(input[pos]))) {
-            var[j] = input[pos];
-            j++;
-            pos++;
-        }
-        var[j] = '\0';
-        *i = pos - 1;
-    } else
-        return NULL;
-    return var;
-}
-
-char *concat_result(char *result, char *value, int *j)
-{
-    if (!value)
-        return result;
-    for (int k = 0; value[k] != '\0'; k++) {
-        result[*j] = value[k];
-        (*j)++;
-    }
-    result[*j] = '\0';
-    return result;
-}
-
-static void manage_variable_value(int *j, char *result, minishel_t **env,
-    char *var)
-{
-    char *value = NULL;
-
-    if (var) {
-        value = get_expand_variables(env, var);
-        result = concat_result(result, value, j);
-        my_free(var);
-    } else {
-        result[*j] = '$';
-        (*j)++;
-    }
-    result[*j] = '\0';
 }
 
 static char *extract_braced_variable(char *input, int *i)
@@ -134,10 +85,9 @@ static void process_braced_variable(char *input, char *result,
     char *var = NULL;
     char *value = NULL;
     iteration_t *iter = get_iterations();
-    
+
     iter->i++;
     var = extract_braced_variable(input, &(iter->i));
-    
     if (var) {
         value = get_expand_variables(env, var);
         result = concat_result(result, value, &(iter->j));

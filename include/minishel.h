@@ -213,6 +213,11 @@ int handle_variable(char **args, minishel_t **llenv);
 int is_equal(char c);
 char *check_variable(char *name, minishel_t **env);
 iteration_t *get_iterations(void);
+void manage_variable_value(int *j, char *result, minishel_t **env,
+    char *var);
+char *concat_result(char *result, char *value, int *j);
+char *get_variable_name(char *input, int *i);
+char *get_expand_variables(minishel_t **env, char *name);
 
 //special variable handling
 char *expand_variables(char *input, minishel_t **env);
