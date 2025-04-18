@@ -16,7 +16,7 @@ static char *process_expvar_backticks(char *cmd, minishel_t **llenv)
 
 static int is_space(char c)
 {
-    return (c != ' ' && c != '\t' && c != '\"' && c != '\n');
+    return (c != ' ' && c != '\t' && c != '\n');
 }
 
 int reset_redirection(int value_ret, int saved_stdin, int saved_stdout)
@@ -52,13 +52,13 @@ int execute_main_cmd(char *cmd, minishel_t **llenv)
     return reset_redirection(ret, saved_stdin, saved_stdout);
 }
 
-int nbr_instr(char const *str, char c)
+int nbr_instr(char *str, char c)
 {
     level_ini_t level = {0};
     int cpt = 0;
 
     for (int i = 0; str[i]; i++) {
-        update_level(&level, str[i]);
+        update_level(&level, str, i);
         if (str[i] == c && is_level_0(&level))
             cpt++;
     }
