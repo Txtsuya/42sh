@@ -6,31 +6,46 @@
 */
 #include "../include/minishel.h"
 
-void update_level(level_ini_t *level, char input)
+static void update_ini(level_ini_t *level, char *input, int i)
 {
-    if (input == '(')
+    if (input[i] == '`') {
+        if (level->level_inibitor == 1)
+            level->level_inibitor -= 1;
+        else
+            level->level_inibitor += 1;
+    }
+}
+
+void update_level(level_ini_t *level, char *input, int i)
+{
+    if (i > 0 && input[i - 1] == '\\') {
+        return;
+    }
+    if (input[i] == '(')
         level->level_par += 1;
-    if (input == ')')
+    if (input[i] == ')')
         level->level_par -= 1;
-    if (input == '\'') {
+    if (input[i] == '\'') {
         if (level->level_signle == 1)
             level->level_signle -= 1;
         else
             level->level_signle += 1;
     }
-    if (input == '\"') {
+    if (input[i] == '\"') {
         if (level->level_double == 1)
             level->level_double -= 1;
         else
             level->level_double += 1;
     }
+    update_ini(level, input, i);
 }
 
 int is_level_0(level_ini_t *level)
 {
     if (level->level_par == 0 &&
         level->level_double == 0 &&
-        level->level_signle == 0) {
+        level->level_signle == 0 &&
+        level->level_inibitor == 0) {
             return 1;
     } else {
         return 0;
@@ -43,7 +58,7 @@ static int count_arg(char *input, int (*func)(char))
     int count = 0;
 
     for (int i = 0; input[i] != '\0'; i++) {
-        update_level(&level, input[i]);
+        update_level(&level, input, i);
         if (func(input[i]) && is_level_0(&level)) {
             count++;
         }
@@ -63,7 +78,23 @@ static char *copy_string_to_array(char *input,
     return temp;
 }
 
-char *process_string(char *str)
+static int handle_inibitors(char *str, int j, char *cleaned, int *k)
+{
+    if (j > 0 && str[j - 1] == '\\' && (str[j] == '\'' || str[j] == '\"')) {
+        if (*k > 0)
+            (*k)--;
+        cleaned[(*k)] = str[j];
+        (*k)++;
+        return 1;
+    } else if (str[j] != '\'' && str[j] != '\"') {
+        cleaned[(*k)] = str[j];
+        (*k)++;
+        return 1;
+    }
+    return 0;
+}
+
+static char *process_string(char *str)
 {
     int len = strlen(str);
     char *cleaned = malloc(sizeof(char) * (len + 1));
@@ -73,10 +104,7 @@ char *process_string(char *str)
     if (cleaned == NULL)
         return NULL;
     for (; j < len; j++) {
-        if (str[j] != '\'' && str[j] != '\"') {
-            cleaned[k] = str[j];
-            k++;
-        }
+        handle_inibitors(str, j, cleaned, &k);
     }
     cleaned[k] = '\0';
     return cleaned;
@@ -112,7 +140,7 @@ char **string_to_array_with_priority(char *input, int (*func)(char))
     char **array = malloc(sizeof(char *) * (count_word + 1));
 
     for (int i = 0; input[i] != '\0'; i++) {
-        update_level(&level, input[i]);
+        update_level(&level, input, i);
         if (func(input[i]) && is_level_0(&level)) {
             array[index] = copy_string_to_array(input, array, start, i);
             index++;

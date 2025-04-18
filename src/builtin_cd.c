@@ -7,6 +7,13 @@
 
 #include "../include/minishel.h"
 
+error_t *get_error(void)
+{
+    static error_t error;
+
+    return &error;
+}
+
 void update_cd_env(char *current, minishel_t **llenv)
 {
     char new_pwd[PATH_MAX];
@@ -19,6 +26,8 @@ void update_cd_env(char *current, minishel_t **llenv)
 
 void cd_error(char *path)
 {
+    error_t *err = get_error();
+
     if (path == NULL)
         my_putstr("cd: ");
     else {
@@ -28,6 +37,7 @@ void cd_error(char *path)
     }
     my_putstr(strerror(errno));
     my_putstr(".\n");
+    err->error_cd = 2;
 }
 
 int builtin_cd(char **args, minishel_t **llenv)
@@ -48,7 +58,7 @@ int builtin_cd(char **args, minishel_t **llenv)
         return 1;
     }
     update_cd_env(current_path, llenv);
-    cwdcmd_value = (minishel_t *)get_special_variable("cwdcmd");
+    cwdcmd_value = (minishel_t *)get_special_variable("cwdcmd", llenv);
     if (cwdcmd_value && cwdcmd_value->value && isatty(STDIN_FILENO))
         execute_multi_cmd(llenv, cwdcmd_value->value);
     return 1;

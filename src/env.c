@@ -7,11 +7,6 @@
 
 #include "../include/minishel.h"
 
-static int is_two_dote(char c)
-{
-    return (c != ':');
-}
-
 static char *base_path(char *cmd)
 {
     const char *path = "/bin/";

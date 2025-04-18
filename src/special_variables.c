@@ -7,11 +7,6 @@
 
 #include "../include/minishel.h"
 
-static char *get_term(minishel_t **env, char *name)
-{
-    return my_getenv(*env, "TERM");
-}
-
 static char *get_cwd(minishel_t **env)
 {
     static char cwd_var[PATH_MAX];
@@ -21,9 +16,9 @@ static char *get_cwd(minishel_t **env)
     return my_getenv(*env, "PWD");
 }
 
-int handle_ignoreeof(char **input)
+int handle_ignoreeof(char **input, minishel_t **env)
 {
-    if (get_special_variable("ignoreeof") != NULL
+    if (get_special_variable("ignoreeof", env) != NULL
         && isatty(STDIN_FILENO)) {
         printf("\nUse 'exit' to leave 42sh.\n");
         *input = my_strdup("");
@@ -33,7 +28,7 @@ int handle_ignoreeof(char **input)
     return 84;
 }
 
-minishel_t *get_special_variable(char *name)
+minishel_t *get_special_variable(char *name, minishel_t **env)
 {
     minishel_t **var = get_variable();
     minishel_t *current;
@@ -49,67 +44,100 @@ minishel_t *get_special_variable(char *name)
     return NULL;
 }
 
-static char *get_expand_variables(minishel_t **env, char *name)
+char *get_expand_variables(minishel_t **env, char *name)
 {
+    minishel_t *var = get_special_variable(name, env);
+    char *value = NULL;
+
     if (my_strcmp(name, "term") == 0)
-        return get_term(env, name);
+        return my_getenv(*env, "TERM");
     if (my_strcmp(name, "cwd") == 0)
         return get_cwd(env);
-    return NULL;
+    value = check_variable(name, env);
+    if (value)
+        return value;
+    return my_getenv(*env, name);
 }
 
-char *get_variable_name(char *input, int *i)
+static char *extract_braced_variable(char *input, int *i)
 {
+    int start = *i + 1;
+    int end = start;
     char *var = NULL;
-    int pos = *i;
-    int j = 0;
+    int len;
 
-    while (input[pos] != '\0' && (input[pos] == '_' || isalnum(input[pos]))) {
-        if (j == 0)
-            var = my_malloc(sizeof(char) * (my_strlen(input) + 1));
-        var[j] = input[pos];
-        j++;
-        pos++;
-    }
-    *i = pos - 1;
-    if (j == 0) {
-        return NULL;
-    }
-    var[j] = '\0';
+    while (input[end] != '\0' && input[end] != '}')
+        end++;
+    if (input[end] == '}') {
+        len = end - start;
+        var = my_malloc(sizeof(char) * (len + 1));
+        strncpy(var, &input[start], len);
+        var[len] = '\0';
+        *i = end;
+    } else
+        *i = start - 2;
     return var;
 }
 
-char *concat_result(char *result, char *value, int *j)
+static void process_braced_variable(char *input, char *result,
+    minishel_t **env)
 {
-    if (!value)
-        return result;
-    for (int k = 0; value[k] != '\0'; k++) {
-        result[*j] = value[k];
-        (*j)++;
+    char *var = NULL;
+    char *value = NULL;
+    iteration_t *iter = get_iterations();
+
+    iter->i++;
+    var = extract_braced_variable(input, &(iter->i));
+    if (var) {
+        value = get_expand_variables(env, var);
+        result = concat_result(result, value, &(iter->j));
+        my_free(var);
+    } else {
+        result[iter->j] = '$';
+        iter->j++;
+        result[iter->j] = '{';
+        iter->j++;
+        result[iter->j] = '\0';
     }
-    result[*j] = '\0';
-    return result;
+}
+
+static void process_simple_variable(char *input, char *result,
+    minishel_t **env)
+{
+    char *var = NULL;
+    iteration_t *iter = get_iterations();
+
+    iter->i++;
+    var = get_variable_name(input, &(iter->i));
+    manage_variable_value(&(iter->j), result, env, var);
+}
+
+static void process_variable(char *input, char *result, minishel_t **env)
+{
+    iteration_t *iter = get_iterations();
+
+    if (input[iter->i + 1] == '{')
+        process_braced_variable(input, result, env);
+    else
+        process_simple_variable(input, result, env);
 }
 
 char *expand_variables(char *input, minishel_t **env)
 {
-    char *result = my_malloc(sizeof(char) * (my_strlen(input) + PATH_MAX + 1));
-    char *var = NULL;
-    char *value = NULL;
-    int i = 0;
-    int j = 0;
+    char *result = my_malloc(sizeof(char) * (my_strlen(input) * 2
+        + PATH_MAX + 1));
+    iteration_t *iter = get_iterations();
 
+    iter->i = 0;
+    iter->j = 0;
     result[0] = '\0';
-    for (i = 0; input[i] != '\0'; i++) {
-        if (input[i] == '$') {
-            i++;
-            var = get_variable_name(input, &i);
-            value = get_expand_variables(env, var);
-            result = concat_result(result, value, &j);
+    for (; input[iter->i] != '\0'; iter->i++) {
+        if (input[iter->i] == '$') {
+            process_variable(input, result, env);
         } else {
-            result[j] = input[i];
-            j++;
-            result[j] = '\0';
+            result[iter->j] = input[iter->i];
+            iter->j++;
+            result[iter->j] = '\0';
         }
     }
     return result;

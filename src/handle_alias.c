@@ -67,7 +67,7 @@ int print_alias(void)
 
 void add_alias(char *line)
 {
-    char *alias = extract_between_quotes(line);
+    char *alias = extract_between_c(line, '"');
     char **value;
     int len_name;
     char *name;
