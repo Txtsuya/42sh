@@ -48,7 +48,6 @@ int handle_variable(char **args, minishel_t **llenv)
     int len_args = len_array(args);
     char **cut_var;
     int len_cut = 0;
-    char *exp_arg = NULL;
 
     if (len_args == 1)
         print_var();
