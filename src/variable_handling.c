@@ -7,6 +7,13 @@
 
 #include "minishel.h"
 
+iteration_t *get_iterations(void)
+{
+    static iteration_t iteration;
+
+    return &iteration;
+}
+
 char *check_variable(char *name, minishel_t **env)
 {
     minishel_t **var = get_variable();
@@ -19,4 +26,3 @@ char *check_variable(char *name, minishel_t **env)
     }
     return NULL;
 }
-

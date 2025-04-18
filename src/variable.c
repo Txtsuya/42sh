@@ -53,8 +53,8 @@ int handle_variable(char **args, minishel_t **llenv)
     if (len_args == 1)
         print_var();
     for (int i = 1; args[i]; i++) {
-        exp_arg = expand_variables(args[i], llenv);
-        cut_var = my_str_to_word_array(exp_arg, is_equal);
+        args[i] = expand_variables(args[i], llenv);
+        cut_var = my_str_to_word_array(args[i], is_equal);
         len_cut = len_array(cut_var);
         if (check_right_argv(cut_var[0]) == 1)
             continue;

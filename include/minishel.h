@@ -49,6 +49,11 @@ typedef struct error_s {
     int error_cd;
 } error_t;
 
+typedef struct iteration_s {
+    int i;
+    int j;
+} iteration_t;
+
 typedef struct command_s {
     char *name;
     int (*handler)(char **args, minishel_t **llenv);
@@ -207,6 +212,7 @@ minishel_t **get_variable(void);
 int handle_variable(char **args, minishel_t **llenv);
 int is_equal(char c);
 char *check_variable(char *name, minishel_t **env);
+iteration_t *get_iterations(void);
 
 //special variable handling
 char *expand_variables(char *input, minishel_t **env);

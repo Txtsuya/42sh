@@ -47,14 +47,16 @@ minishel_t *get_special_variable(char *name, minishel_t **env)
 static char *get_expand_variables(minishel_t **env, char *name)
 {
     minishel_t *var = get_special_variable(name, env);
+    char *value = NULL;
 
     if (my_strcmp(name, "term") == 0)
         return my_getenv(*env, "TERM");
     if (my_strcmp(name, "cwd") == 0)
         return get_cwd(env);
-    if (check_variable(name, env) == NULL)
-        return my_getenv(*env, name);
-    return NULL;
+    value = check_variable(name, env);
+    if (value)
+        return value;
+    return my_getenv(*env, name);
 }
 
 char *get_variable_name(char *input, int *i)
@@ -106,24 +108,69 @@ static void manage_variable_value(int *j, char *result, minishel_t **env,
     result[*j] = '\0';
 }
 
-char *expand_variables(char *input, minishel_t **env)
+static char *extract_braced_variable(char *input, int *i)
 {
-    char *result = my_malloc(sizeof(char) * (my_strlen(input) * 2 + PATH_MAX + 1));
+    int start = *i + 1;
+    int end = start;
+    char *var = NULL;
+    int len;
+
+    while (input[end] != '\0' && input[end] != '}')
+        end++;
+    if (input[end] == '}') {
+        len = end - start;
+        var = my_malloc(sizeof(char) * (len + 1));
+        strncpy(var, &input[start], len);
+        var[len] = '\0';
+        *i = end;
+    } else
+        *i = start - 2;
+    return var;
+}
+
+static void process_variable(char *input, char *result, minishel_t **env)
+{
     char *var = NULL;
     char *value = NULL;
-    int i = 0;
-    int j = 0;
+    iteration_t *iter = get_iterations();
 
-    result[0] = '\0';
-    for (i = 0; input[i] != '\0'; i++) {
-        if (input[i] == '$') {
-            i++;
-            var = get_variable_name(input, &i);
-            manage_variable_value(&j, result, env, var);
+    if (input[iter->i + 1] == '{') {
+        iter->i++;
+        var = extract_braced_variable(input, &(iter->i));
+        if (var) {
+            value = get_expand_variables(env, var);
+            result = concat_result(result, value, &(iter->j));
+            my_free(var);
         } else {
-            result[j] = input[i];
-            j++;
-            result[j] = '\0';
+            result[iter->j] = '$';
+            iter->j++;
+            result[iter->j] = '{';
+            iter->j++;
+            result[iter->j] = '\0';
+        }
+    } else {
+        iter->i++;
+        var = get_variable_name(input, &(iter->i));
+        manage_variable_value(&(iter->j), result, env, var);
+    }
+}
+
+char *expand_variables(char *input, minishel_t **env)
+{
+    char *result = my_malloc(sizeof(char) * (my_strlen(input) * 2
+        + PATH_MAX + 1));
+    iteration_t *iter = get_iterations();
+
+    iter->i = 0;
+    iter->j = 0;
+    result[0] = '\0';
+    for (; input[iter->i] != '\0'; iter->i++) {
+        if (input[iter->i] == '$') {
+            process_variable(input, result, env);
+        } else {
+            result[iter->j] = input[iter->i];
+            iter->j++;
+            result[iter->j] = '\0';
         }
     }
     return result;
