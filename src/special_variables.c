@@ -128,31 +128,48 @@ static char *extract_braced_variable(char *input, int *i)
     return var;
 }
 
-static void process_variable(char *input, char *result, minishel_t **env)
+static void process_braced_variable(char *input, char *result,
+    minishel_t **env)
 {
     char *var = NULL;
     char *value = NULL;
     iteration_t *iter = get_iterations();
-
-    if (input[iter->i + 1] == '{') {
-        iter->i++;
-        var = extract_braced_variable(input, &(iter->i));
-        if (var) {
-            value = get_expand_variables(env, var);
-            result = concat_result(result, value, &(iter->j));
-            my_free(var);
-        } else {
-            result[iter->j] = '$';
-            iter->j++;
-            result[iter->j] = '{';
-            iter->j++;
-            result[iter->j] = '\0';
-        }
+    
+    iter->i++;
+    var = extract_braced_variable(input, &(iter->i));
+    
+    if (var) {
+        value = get_expand_variables(env, var);
+        result = concat_result(result, value, &(iter->j));
+        my_free(var);
     } else {
-        iter->i++;
-        var = get_variable_name(input, &(iter->i));
-        manage_variable_value(&(iter->j), result, env, var);
+        result[iter->j] = '$';
+        iter->j++;
+        result[iter->j] = '{';
+        iter->j++;
+        result[iter->j] = '\0';
     }
+}
+
+static void process_simple_variable(char *input, char *result,
+    minishel_t **env)
+{
+    char *var = NULL;
+    iteration_t *iter = get_iterations();
+
+    iter->i++;
+    var = get_variable_name(input, &(iter->i));
+    manage_variable_value(&(iter->j), result, env, var);
+}
+
+static void process_variable(char *input, char *result, minishel_t **env)
+{
+    iteration_t *iter = get_iterations();
+
+    if (input[iter->i + 1] == '{')
+        process_braced_variable(input, result, env);
+    else
+        process_simple_variable(input, result, env);
 }
 
 char *expand_variables(char *input, minishel_t **env)
