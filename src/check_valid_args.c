@@ -18,7 +18,7 @@ int valid_name(char *name)
         if (!((name[i] >= 'a' && name[i] <= 'z') ||
             (name[i] >= 'A' && name[i] <= 'Z') ||
             (name[i] >= '0' && name[i] <= '9') ||
-            name[i] == '_' || name[i] == '='))
+            name[i] == '_' || name[i] == '=' || name[i] == '$'))
             return 0;
     }
     return 1;

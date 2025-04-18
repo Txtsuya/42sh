@@ -17,10 +17,11 @@ static int check_valide_output(char *line)
     return 1;
 }
 
-int process_ignoreeof(char **input, size_t len, int ret_status)
+int process_ignoreeof(char **input, size_t len, int ret_status,
+    minishel_t **env)
 {
     if (getline(input, &len, stdin) == -1) {
-        if (handle_ignoreeof(input) == 0)
+        if (handle_ignoreeof(input, env) == 0)
             return 1;
         exit(ret_status);
     }
@@ -30,12 +31,13 @@ int process_ignoreeof(char **input, size_t len, int ret_status)
 int get_input(char **input, int ret_status, minishel_t **llenv)
 {
     size_t len = 0;
-    minishel_t *precmd_value = (minishel_t *)get_special_variable("precmd");
+    minishel_t *precmd_value =
+        (minishel_t *)get_special_variable("precmd", llenv);
 
     if (precmd_value && precmd_value->value && isatty(STDIN_FILENO))
         execute_multi_cmd(llenv, precmd_value->value);
     print_prompt(llenv);
-    if (process_ignoreeof(input, len, ret_status) == 1)
+    if (process_ignoreeof(input, len, ret_status, llenv) == 1)
         return 1;
     if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n')
         (*input)[my_strlen(*input) - 1] = '\0';

@@ -49,6 +49,11 @@ typedef struct error_s {
     int error_cd;
 } error_t;
 
+typedef struct iteration_s {
+    int i;
+    int j;
+} iteration_t;
+
 typedef struct command_s {
     char *name;
     int (*handler)(char **args, minishel_t **llenv);
@@ -206,12 +211,19 @@ int check_is_builtin(char *type);
 minishel_t **get_variable(void);
 int handle_variable(char **args, minishel_t **llenv);
 int is_equal(char c);
+char *check_variable(char *name, minishel_t **env);
+iteration_t *get_iterations(void);
+void manage_variable_value(int *j, char *result, minishel_t **env,
+    char *var);
+char *concat_result(char *result, char *value, int *j);
+char *get_variable_name(char *input, int *i);
+char *get_expand_variables(minishel_t **env, char *name);
 
 //special variable handling
 char *expand_variables(char *input, minishel_t **env);
 char *get_variable_name(char *input, int *i);
-minishel_t *get_special_variable(char *name);
-int handle_ignoreeof(char **input);
+minishel_t *get_special_variable(char *name, minishel_t **env);
+int handle_ignoreeof(char **input, minishel_t **env);
 
 //shell command handling
 int which_cmd(char *cmd, minishel_t **llenv);
