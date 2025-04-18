@@ -7,7 +7,7 @@
 
 #include "../include/minishel.h"
 
-int valid_name(const char *name)
+int valid_name(char *name)
 {
     if (nbr_instr(name, '=') > 0)
         return 0;

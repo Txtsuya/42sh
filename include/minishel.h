@@ -102,7 +102,7 @@ typedef struct job_s {
 
 char **clean_quote(char **array);
 int is_level_0(level_ini_t *level);
-void update_level(level_ini_t *level, char input);
+void update_level(level_ini_t *level, char *input, int i);
 job_t **get_job_list(void);
 void safely_print_jobs_done(void);
 
@@ -164,7 +164,7 @@ char *get_path_cmd(char *args, minishel_t **llenv);
 int execute_multi_cmd(minishel_t **llenv, char *input);
 int execute_main_cmd(char *cmd, minishel_t **llenv);
 int executepipe(char *token, minishel_t **llenv);
-int nbr_instr(char const *str, char c);
+int nbr_instr(char *str, char c);
 void free_array(char **tab);
 int parse_redirections(char **args);
 char **remove_redirections(char **args);
