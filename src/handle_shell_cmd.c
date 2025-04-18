@@ -101,7 +101,10 @@ int handle_where(char **args, minishel_t **llenv)
         fprintf(stderr, "where: Too few arguments.\n");
         return 1;
     }
-    for (int i = 1; args[i]; i++)
+    for (int i = 1; args[i]; i++) {
+        if (check_is_builtin(args[i]) == 1)
+            printf("%s: is a shell built-in\n", args[i]);
         print_command_paths(path_env, args[i]);
+    }
     return 1;
 }
