@@ -19,8 +19,13 @@ static int error_command_not_found(char *path_cmd, char *args)
     return 0;
 }
 
-static int execve_error(char *command)
+static int execve_error(char *command, char **env)
 {
+    if (check_env_void(env)) {
+        my_putstr(command);
+        my_putstr(": Command not found.\n");
+        return 1;
+    }
     if (errno == ENOENT) {
         my_putstr(command);
         my_putstr(": Permission denied.\n");
@@ -40,7 +45,7 @@ static int handle_child_process(char *path_cmd, char **args, char **env_array)
 {
     error_command_not_found(path_cmd, args[0]);
     if (execve(path_cmd, args, env_array) == -1)
-        exit(execve_error(args[0]));
+        exit(execve_error(args[0], env_array));
     return 0;
 }
 

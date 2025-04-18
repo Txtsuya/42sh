@@ -240,5 +240,7 @@ int process_token(char *token, minishel_t **llenv);
 
 //builtins error
 error_t *get_error(void);
+char *my_get_env_char(char *name, char **env);
+int check_env_void(char **env);
 
 #endif
