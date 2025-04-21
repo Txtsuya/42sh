@@ -31,3 +31,21 @@ char *extract_then(char *str)
     return cmd;
 }
 
+char *extract_else(char *str)
+{
+    char *endif_part = my_strstr(str, "endif");
+    int len = 0;
+    char *cmd = NULL;
+
+    if (!str || !endif_part)
+        return NULL;
+    str += 4;
+    while (*str && isspace(*str))
+        str++;
+    len = endif_part - str;
+    cmd = my_malloc(len + 1);
+    strncpy(cmd, str, len);
+    cmd[len] = '\0';
+    return cmd;    
+}
+

@@ -233,6 +233,10 @@ int handle_which(char *cmd, minishel_t **llenv);
 int handle_where(char **args, minishel_t **llenv);
 int handle_if(char *str, minishel_t **llenv);
 
+//if handling
+char *extract_then(char *str);
+char *extract_else(char *str);
+
 //linux bc binary handling
 int bc_evaluation(char *condition);
 
