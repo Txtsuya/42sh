@@ -7,6 +7,7 @@
 
 #ifndef MINISHEL_H
     #define MINISHEL_H
+    #define TTY_PRINT(str) if (isatty(0)) my_putstr(str)
 
     #include <stddef.h>
     #include <stdio.h>
@@ -230,6 +231,7 @@ int which_cmd(char *cmd, minishel_t **llenv);
 int handle_repeat(char *cmd, minishel_t **llenv);
 int handle_which(char *cmd, minishel_t **llenv);
 int handle_where(char **args, minishel_t **llenv);
+int handle_if(char **args, minishel_t **llenv);
 
 //and or errors
 int validate_and(char *cmd);
