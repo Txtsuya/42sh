@@ -73,7 +73,7 @@ int handle_if(char *str, minishel_t **llenv)
         return 1;
     }
     condition_result = bc_evaluation(condition);
-    if (!handle_then)
+    if (handle_then(str) == 1)
         return 1;
     if (condition_result)
         extract_part(str, llenv);

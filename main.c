@@ -25,7 +25,7 @@ int handle_builtin_cmd(char ***arguments, char *input, minishel_t **llenv)
         {"unalias", handle_unalias}, {"history", print_history},
         {"set", handle_variable}, {"jobs", print_jobs}, {"fg", forground},
         {"bg", background}, {"unset", handle_unset}, {"where", handle_where},
-        {"if", handle_if}, {NULL, NULL}};
+        {NULL, NULL}};
 
     if (my_strcmp(input, "") == 0)
         return 1;
