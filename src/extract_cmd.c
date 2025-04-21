@@ -46,59 +46,82 @@ char *extract_else(char *str)
     cmd = my_malloc(len + 1);
     strncpy(cmd, str, len);
     cmd[len] = '\0';
-    return cmd;    
+    return cmd;
 }
 
-static int is_if_statement_start(const char *str) {
-    return (strncmp(str, "if ", 3) == 0 || strncmp(str, "if(", 3) == 0);
+static int is_if_statement_start(const char *str)
+{
+    return (my_strncmp(str, "if ", 3) == 0 || my_strncmp(str, "if(", 3) == 0);
 }
 
-static char *handle_nested_if(char *current, int *nesting) {
+static char *handle_nested_if(char *current, int *nesting)
+{
     char *nested_then = strstr(current + 3, "then");
-    if (!nested_then) 
+
+    if (!nested_then)
         return current + 1;
-        
     *nesting += 1;
     return nested_then + 4;
 }
 
-static char *handle_endif(char *current, int *nesting, int *should_return_null) {
+static char *handle_endif(char *current, int *nesting, int *should_return_null)
+{
     *nesting -= 1;
     *should_return_null = (*nesting == 0);
     return current + 5;
 }
 
-static char *handle_else(char *current, int nesting, int *found_else) {
+static char *handle_else(char *current, int nesting, int *found_else)
+{
     *found_else = (nesting == 1);
+    return current;
+}
+
+int should_continue_search(char *current, int *nesting, int *found_else,
+    int *should_return_null)
+{
+    if (is_if_statement_start(current)) {
+        *nesting += 1;
+        return 1;
+    }
+    if (strncmp(current, "endif", 5) == 0) {
+        *nesting -= 1;
+        *should_return_null = (*nesting == 0);
+        return 1;
+    }
+    if (strncmp(current, "else", 4) == 0) {
+        *found_else = (*nesting == 1);
+        return !(*found_else);
+    }
+    return 1;
+}
+
+char *process_tokens(char *current, int *nesting, int *found_else,
+    int *should_return_null)
+{
+    while (*current && !*found_else && !*should_return_null) {
+        if (!should_continue_search(current, nesting,
+            found_else, should_return_null)) {
+            break;
+        }
+        current++;
+    }
     return current;
 }
 
 char *find_else(char *input)
 {
     char *then_part = strstr(input, "then");
-    if (!then_part) 
-        return NULL;
-    char *current = then_part + 4;
+    char *current = NULL;
     int nesting = 1;
     int should_return_null = 0;
     int found_else = 0;
 
-    while (*current && !found_else && !should_return_null) {
-        if (is_if_statement_start(current)) {
-            current = handle_nested_if(current, &nesting);
-            continue;
-        }
-        if (strncmp(current, "endif", 5) == 0) {
-            current = handle_endif(current, &nesting, &should_return_null);
-            continue;
-        }
-        if (strncmp(current, "else", 4) == 0) {
-            current = handle_else(current, nesting, &found_else);
-            if (found_else)
-                break;
-        }
-        current++;
-    }
+    if (!then_part)
+        return NULL;
+    current = then_part + 4;
+    current = process_tokens(current, &nesting, &found_else,
+        &should_return_null);
     if (should_return_null || !found_else)
         return NULL;
     return current;
