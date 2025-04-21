@@ -33,7 +33,7 @@ int exec_bc(char *condition)
     close(pipefd[1]);
     dup2(pipefd[0], STDIN_FILENO);
     close(pipefd[0]);
-    execvp("bc -l", args);
+    execvp("bc", args);
     exit(1);
 }
 

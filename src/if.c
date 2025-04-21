@@ -34,7 +34,7 @@ char *extract_condition(char *str)
 
 int evaluate_condition(char *condition)
 {
-    return (atoi(condition) != 0);
+    return bc_evaluation(condition);
 }
 
 int exec_cmd_after_parenthesis(int result, minishel_t **llenv, char *input)
