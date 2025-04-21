@@ -130,7 +130,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     char **all_cmd = string_to_array_with_priority(input, is_separator);
     int status = 0;
 
-    if (check_if_args(input))
+    if (is_if_command(input))
         return handle_if(input, llenv);
     if (validate_cmd_syntax(input) != 0)
         return 1;

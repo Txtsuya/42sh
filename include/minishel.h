@@ -234,7 +234,7 @@ int handle_where(char **args, minishel_t **llenv);
 int handle_if(char *str, minishel_t **llenv);
 
 //if handling
-int check_if_args(char *str);
+int is_if_command(char *input);
 char *extract_then(char *str);
 char *extract_else(char *str);
 char *find_else(char *input);

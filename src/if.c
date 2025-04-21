@@ -7,77 +7,71 @@
 
 #include "minishel.h"
 
-int check_if_args(char *str)
+int is_if_command(char *input)
 {
-    if (my_strcmp("if ", str) == 0 || my_strcmp("if(", str) == 0)
-        return 1;
-    return 0;
+    return (strncmp(input, "if ", 3) == 0 || strncmp(input, "if(", 3) == 0);
 }
 
 char *extract_condition(char *str)
 {
-    char *start = my_strchr(str, '(');
-    char *end = my_strchr(str, ')');
-    int len = 0;
-    char *condition = NULL;
+    char *start = strchr(str, '(');
+    char *end = strchr(str, ')');
+    int len;
+    char *condition;
 
-    if (!start || !end || !str)
+    if (!start || !end || end <= start)
         return NULL;
     len = end - start - 1;
+    if (len <= 0)
+        return NULL;
     condition = my_malloc(len + 1);
+    if (!condition)
+        return NULL;
     strncpy(condition, start + 1, len);
     condition[len] = '\0';
     return condition;
 }
 
-static void extract_part(char *str, minishel_t **llenv)
+int evaluate_condition(char *condition)
 {
-    char *then_cmd = extract_then(str);
-
-    if (then_cmd) {
-        execute_multi_cmd(llenv, then_cmd);
-        my_free(then_cmd);
-    }
+    return (atoi(condition) != 0);
 }
 
-static void handle_else(char *str, minishel_t **llenv)
+int exec_cmd_after_parenthesis(int result, minishel_t **llenv, char *input)
 {
-    char *else_part = find_else(str);
-    char *else_cmd = NULL;
-
-    if (else_part) {
-        else_cmd = extract_else(else_part);
-        if (else_cmd) {
-            execute_multi_cmd(llenv, str);
-            my_free(else_cmd);
+    if (result) {
+        input = strchr(input, ')');
+        if (!input) {
+            printf("Too many )'s.");
+            return 1;
         }
+        input++;
+        while (*input && isspace(*input))
+            input++;
+        if (*input)
+            return execute_multi_cmd(llenv, input);
     }
-}
-
-static int handle_then(char *str)
-{
-    char *then_part = my_strstr(str, "then");
-
-    if (!then_part)
-        return 1;
     return 0;
 }
 
-int handle_if(char *str, minishel_t **llenv)
+int handle_if(char *input, minishel_t **llenv)
 {
-    char *condition = extract_condition(str);
-    int condition_result = 0;
+    char *condition;
+    int result;
+    char *then_part;
+    char *command;
 
+    input += 2;
+    while (*input && isspace(*input))
+        input++;
+    condition = extract_condition(input);
     if (!condition) {
-        printf("if: Empty if.\n");
+        printf("if: Expression Syntax.\n");
         return 1;
     }
-    condition_result = bc_evaluation(condition);
-    if (handle_then(str) == 1)
+    result = evaluate_condition(condition);
+    my_free(condition);
+    if (exec_cmd_after_parenthesis(result, llenv, input) == 1)
         return 1;
-    if (condition_result)
-        extract_part(str, llenv);
-    else
-        handle_else(str, llenv);
     return 0;
 }
