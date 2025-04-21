@@ -37,7 +37,7 @@ int exec_bc(char *condition)
     exit(1);
 }
 
-int bc_evaluation(char *condition, minishel_t **llenv)
+int bc_evaluation(char *condition)
 {
     int pipefd[2];
     pid_t pid;

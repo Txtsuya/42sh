@@ -30,10 +30,54 @@ char *extract_condition(char *str)
     return condition;
 }
 
-int handle_if(char **args, minishel_t **llenv)
+static void extract_part(char *str, minishel_t **llenv)
 {
-    int condition = 0;
+    char *then_cmd = extract_then(str);
 
-    if (args[1] == NULL)
-        printf("if: Too few arguments.\n");
+    if (then_cmd) {
+        execute_multi_cmd(llenv, then_cmd);
+        my_free(then_cmd);
+    }
+}
+
+static void handle_else(char *str, minishel_t **llenv)
+{
+    char *else_part = find_else(str);
+    char *else_cmd = NULL;
+
+    if (else_part) {
+        else_cmd = extract_else(else_part);
+        if (else_cmd) {
+            execute_multi_cmd(llenv, str);
+            my_free(else_cmd);
+        }
+    }
+}
+
+static int handle_then(char *str)
+{
+    char *then_part = my_strstr(str, "then");
+
+    if (!then_part)
+        return 1;
+    return 0;
+}
+
+int handle_if(char *str, minishel_t **llenv)
+{
+    char *condition = extract_condition(str);
+    int condition_result = 0;
+
+    if (!condition) {
+        printf("if: Empty if.\n");
+        return 1;
+    }
+    condition_result = bc_evaluation(condition);
+    if (!handle_then)
+        return 1;
+    if (condition_result)
+        extract_part(str, llenv);
+    else
+        handle_else(str, llenv);
+    return 0;
 }

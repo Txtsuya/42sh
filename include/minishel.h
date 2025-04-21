@@ -231,7 +231,10 @@ int which_cmd(char *cmd, minishel_t **llenv);
 int handle_repeat(char *cmd, minishel_t **llenv);
 int handle_which(char *cmd, minishel_t **llenv);
 int handle_where(char **args, minishel_t **llenv);
-int handle_if(char **args, minishel_t **llenv);
+int handle_if(char *str, minishel_t **llenv);
+
+//linux bc binary handling
+int bc_evaluation(char *condition);
 
 //and or errors
 int validate_and(char *cmd);
