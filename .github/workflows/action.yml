@@ -1,8 +1,8 @@
-name: COREWAR
+name: 42sh
 
 env:
-  EXECUTABLES: corewar
-  MIRROR_URL: git@github.com:EpitechPGEPromo2029/B-CPE-200-NCE-2-1-corewar-aryan.bhotey.git
+  EXECUTABLES: 42sh
+  MIRROR_URL: EpitechPGEPromo2029/B-PSU-200-NCE-2-1-42sh-simon.puccio.git
 
 on: [push, pull_request]
 
@@ -35,7 +35,7 @@ jobs:
         run: make
 
       - name: Check for banned functions
-        run: .github/workflows/check_banned_function corewar -a .github/workflows/authorized_functions.txt
+        run: .github/workflows/check_banned_function 42sh -a .github/workflows/authorized_functions.txt
 
   check_coding_style:
     needs: check_banned_functions
