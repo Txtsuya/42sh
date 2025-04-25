@@ -202,6 +202,7 @@ void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
+int my_getline(char **input, char *path);
 int is_two_dote(char c);
 void print_prompt(minishel_t **llenv);
 

@@ -20,7 +20,7 @@ static int check_valide_output(char *line)
 int process_ignoreeof(char **input, size_t len, int ret_status,
     minishel_t **env)
 {
-    if (getline(input, &len, stdin) == -1) {
+    if (my_getline(input, my_getenv(*env, "PWD")) == -1) {
         if (handle_ignoreeof(input, env) == 0)
             return 1;
         exit(ret_status);
