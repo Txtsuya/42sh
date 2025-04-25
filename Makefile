@@ -10,7 +10,8 @@ NAME	 	=		42sh
 SRCS		=		$(wildcard src/*.c) \
 					$(wildcard ./lib/my/*.c) $(wildcard ./lib/my_malloc/*.c) \
 					$(wildcard src/jobs_control/*.c) \
-					$(wildcard src/parentese_sys/*.c)
+					$(wildcard src/parentese_sys/*.c) \
+					$(wildcard src/getline/*.c)
 
 OBJS        =               $(SRCS:.c=.o)
 

@@ -21,11 +21,9 @@ int get_input(char **input, int ret_status, minishel_t **llenv)
 {
     size_t len = 0;
 
-    if (isatty(STDIN_FILENO)) {
-        my_putstr(my_getenv(*llenv, "PWD"));
-        my_putstr(" > ");
-    }
-    if (getline(input, &len, stdin) == -1) {
+    free(*input);
+    *input == NULL;
+    if (my_getline(input, my_getenv(*llenv, "PWD")) == -1) {
         exit(ret_status);
     }
     if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n') {
