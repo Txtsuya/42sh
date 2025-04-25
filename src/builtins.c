@@ -7,6 +7,18 @@
 
 #include "../include/minishel.h"
 
+int check_is_builtin(char *type)
+{
+    const char *types[] = {"cd", "exit", "env", "alias", "unsetenv",
+        "unalias", "set", "jobs", "history", "unset", "bg", "echo", NULL};
+
+    for (int i = 0; types[i]; i++) {
+        if (my_strcmp(type, types[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 void add_llist_env(char *pwd, minishel_t **llenv, const char *name)
 {
     add_llist(llenv, name, pwd);
@@ -47,26 +59,4 @@ void print_env(minishel_t *head)
         my_putstr("\n");
         head = head->next;
     }
-}
-
-int handle_builtin_cmd(char ***arguments, char *input, minishel_t **llenv)
-{
-    char **args = *arguments;
-    command_t commands[] = {{"env", handle_env},
-        {"/usr/bin/env", handle_env}, {"setenv", handle_setenv},
-        {"unsetenv", handle_unsetenv}, {"exit", handle_exit},
-        {"cd", handle_cd}, {"alias", handle_alias},
-        {"unalias", handle_unalias}, {"history", print_history},
-        {"set", handle_variable}, {"jobs", print_jobs}, {"fg", forground},
-        {"bg", background}, {"unset", handle_unset},
-        {NULL, NULL}};
-
-    if (my_strcmp(input, "") == 0)
-        return 1;
-    for (int i = 0; commands[i].name != NULL; i++) {
-        if (my_strcmp(args[0], commands[i].name) == 0) {
-            return commands[i].handler(args, llenv);
-        }
-    }
-    return 0;
 }

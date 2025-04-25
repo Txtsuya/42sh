@@ -37,7 +37,7 @@ static int check_job(job_t *job)
     return 0;
 }
 
-int forground(char **args)
+int forground(char **args, minishel_t **llenv)
 {
     int id = args[1] ? get_num(args[1]) : 1;
     job_t *job = find_job_by_id(id);
@@ -61,7 +61,7 @@ int forground(char **args)
     return handle_foreground_status(job, status);
 }
 
-int background(char **args)
+int background(char **args, minishel_t **llenv)
 {
     int id = args[1] ? get_num(args[1]) : 1;
     job_t *job = find_job_by_id(id);

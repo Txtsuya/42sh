@@ -7,7 +7,7 @@
 
 #include "minishel.h"
 
-static int is_equal(char c)
+int is_equal(char c)
 {
     return (c != '=');
 }
@@ -52,15 +52,15 @@ int handle_variable(char **args, minishel_t **llenv)
     if (len_args == 1)
         print_var();
     for (int i = 1; args[i]; i++) {
+        args[i] = expand_variables(args[i], llenv);
         cut_var = my_str_to_word_array(args[i], is_equal);
         len_cut = len_array(cut_var);
         if (check_right_argv(cut_var[0]) == 1)
             continue;
-        if (len_cut == 2) {
+        if (len_cut == 2)
             add_llist(variable, cut_var[0], cut_var[1]);
-        } else {
+        else
             add_llist(variable, cut_var[0], NULL);
-        }
         free_array(cut_var);
     }
     return 1;

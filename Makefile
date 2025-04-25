@@ -13,12 +13,16 @@ SRCS		=		$(wildcard src/*.c) \
 					$(wildcard src/parentese_sys/*.c) \
 					$(wildcard src/getline/*.c)
 
+SRCS_BONUS	=		$(wildcard bonus/*.c)
+
 OBJS        =               $(SRCS:.c=.o)
+
+OBJS_BONUS        =               $(SRCS_BONUS:.c=.o)
 
 CFLAGS  	=	-Wall -Wextra -Wno-unused -I ./include
 
 $(NAME)         :               $(OBJS)
-				 	gcc -Wall -Wextra -o $(NAME) $(OBJS) $(CFLAGS)
+				 	gcc -Wall -Wextra -o $(NAME) main.c $(OBJS) $(CFLAGS)
 
 all             :               $(NAME)
 
@@ -61,3 +65,6 @@ runvalcheck		:	val
 tester	:	re
 		cp $(NAME) ./tester
 		cd tester
+
+bonus		:			$(OBJS) $(OBJS_BONUS)
+				gcc -Wall -Wextra -o $(NAME) $(OBJS_BONUS) $(OBJS) $(CFLAGS)

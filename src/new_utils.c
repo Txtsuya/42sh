@@ -17,18 +17,30 @@ static int check_valide_output(char *line)
     return 1;
 }
 
+int process_ignoreeof(char **input, size_t len, int ret_status,
+    minishel_t **env)
+{
+    if (my_getline(input, my_getenv(*env, "PWD")) == -1) {
+        if (handle_ignoreeof(input, env) == 0)
+            return 1;
+        exit(ret_status);
+    }
+    return 84;
+}
+
 int get_input(char **input, int ret_status, minishel_t **llenv)
 {
     size_t len = 0;
+    minishel_t *precmd_value =
+        (minishel_t *)get_special_variable("precmd", llenv);
 
-    free(*input);
-    *input == NULL;
-    if (my_getline(input, my_getenv(*llenv, "PWD")) == -1) {
-        exit(ret_status);
-    }
-    if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n') {
+    if (precmd_value && precmd_value->value && isatty(STDIN_FILENO))
+        execute_multi_cmd(llenv, precmd_value->value);
+    print_prompt(llenv);
+    if (process_ignoreeof(input, len, ret_status, llenv) == 1)
+        return 1;
+    if ((*input)[0] != '\0' && (*input)[my_strlen(*input) - 1] == '\n')
         (*input)[my_strlen(*input) - 1] = '\0';
-    }
     if (check_valide_output(*input))
         return 1;
     *input = clean_str(*input);
@@ -62,13 +74,17 @@ int main_loop(minishel_t **llenv)
 {
     char *input = NULL;
     int status = 0;
+    error_t *err = get_error();
 
     while (1) {
         update_jobs_status();
         safely_print_jobs_done();
         if (get_input(&input, status, llenv))
             continue;
+        err->error_cd = 0;
         status = execute_multi_cmd(llenv, input);
+        if (err->error_cd == 2)
+            status = 1;
     }
     free(input);
     free_all();

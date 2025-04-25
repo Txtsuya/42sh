@@ -87,6 +87,7 @@ void check_alias(char ***args)
     new[i] = NULL;
     free_array(*args);
     *args = new;
+    check_alias(args);
 }
 
 int handle_unalias(char **args, minishel_t **llenv)
