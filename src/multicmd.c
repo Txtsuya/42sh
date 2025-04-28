@@ -5,6 +5,7 @@
 ** multicmd.c
 */
 
+
 #include "../include/minishel.h"
 
 static int is_separator(char c)
@@ -36,51 +37,6 @@ void free_array(char **tab)
     my_free(tab);
 }
 
-static int handle_and(char *cmd, minishel_t **llenv)
-{
-    int status = 0;
-    char *tkt_ptr;
-    char *token;
-    error_t *err = get_error();
-
-    if (validate_cmd_syntax(cmd) != 0)
-        return 1;
-    token = strtok_r(cmd, "&&", &tkt_ptr);
-    while (token != NULL) {
-        status = process_token(token, llenv);
-        if (err->error_cd == 2) {
-            status = 1;
-            break;
-        }
-        if (status != 0)
-            break;
-        token = strtok_r(NULL, "&&", &tkt_ptr);
-    }
-    return status;
-}
-
-static int handle_or(char *cmd, minishel_t **llenv)
-{
-    int status = 1;
-    char *tkt_ptr;
-    char *token;
-    error_t *err = get_error();
-
-    if (validate_cmd_syntax(cmd) != 0)
-        return 1;
-    token = strtok_r(cmd, "||", &tkt_ptr);
-    while (token != NULL) {
-        err->error_cd = 0;
-        status = process_token(token, llenv);
-        if (err->error_cd == 2)
-            status = 1;
-        if (status == 0 && err->error_cd != 2)
-            break;
-        token = strtok_r(NULL, "||", &tkt_ptr);
-    }
-    return status;
-}
-
 static void parse_token(char *token)
 {
     int len = my_strlen(token);
@@ -104,25 +60,82 @@ static int is_parentese(char *input)
     return 0;
 }
 
-int handle_token(char *token, minishel_t **llenv)
+static int handle_or_op(char *token, minishel_t **llenv)
+{
+    int status;
+    char *or_token = my_strstr(token, "||");
+    char *or_copy;
+    error_t *err = get_error();
+    
+    if (or_token == NULL)
+        return -1;
+    or_copy = my_strdup(token);
+    if (or_copy == NULL)
+        return 1;
+    or_copy[or_token - token] = '\0';
+    err->error_cd = 0;
+    status = handle_tok(or_copy, llenv);
+    if (err->error_cd == 2)
+        status = 1;
+    if (status != 0)
+        status = handle_tok(or_token + 2, llenv);
+    my_free(or_copy);
+    return status;
+}
+
+static int handle_and_op(char *token, minishel_t **llenv)
+{
+    int status;
+    char *and_token = my_strstr(token, "&&");
+    char *and_copy;
+    error_t *err = get_error();
+    
+    if (and_token == NULL)
+        return -1;
+    and_copy = my_strdup(token);
+    if (and_copy == NULL)
+        return 1;
+    and_copy[and_token - token] = '\0';
+    err->error_cd = 0;
+    status = handle_tok(and_copy, llenv);
+    if (err->error_cd == 2)
+        status = 1;
+    if (status == 0 && err->error_cd != 2)
+        status = handle_tok(and_token + 2, llenv);
+    my_free(and_copy);
+    return status;
+}
+
+static int execute_simple_command(char *token, minishel_t **llenv)
 {
     int status = 0;
-    int len = 0;
-    const char *cmd[] = {"repeat", "which", "&&", "&", "||", NULL};
-    int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which,
-        handle_and, handle_background, handle_or};
+    const char *cmd[] = {"repeat", "which", "&", NULL};
+    int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which, handle_background};
 
-    if (validate_cmd_syntax(token) != 0)
-        return 1;
-    if (is_parentese(token))
-        return handle_parenthese(llenv, token);
     for (int i = 0; cmd[i]; i++) {
-        if (my_strstr(token, cmd[i]) != NULL)
+        if (my_strstr(token, cmd[i]) != NULL) {
             return handlers[i](token, llenv);
+        }
     }
     parse_token(token);
-    status = which_cmd(token, llenv);
-    return status;
+    return which_cmd(token, llenv);
+}
+
+int handle_tok(char *token, minishel_t **llenv)
+{
+    int status;
+    
+    if (validate_cmd_syntax(token) != 0)
+        return 1;        
+    if (is_parentese(token))
+        return handle_parenthese(llenv, token);    
+    status = handle_or_op(token, llenv);
+    if (status != -1)
+        return status;    
+    status = handle_and_op(token, llenv);
+    if (status != -1)
+        return status;    
+    return execute_simple_command(token, llenv);
 }
 
 int execute_multi_cmd(minishel_t **llenv, char *input)
@@ -135,7 +148,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     if (validate_cmd_syntax(input) != 0)
         return 1;
     for (int i = 0; all_cmd[i] != NULL; i++)
-        status = handle_token(all_cmd[i], llenv);
+        status = handle_tok(all_cmd[i], llenv);
     free_array(all_cmd);
     return status;
 }
