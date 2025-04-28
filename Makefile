@@ -63,8 +63,7 @@ runvalcheck		:	val
 				valgrind --leak-check=full ./$(NAME)
 
 tester	:	re
-		cp $(NAME) ./tester
-		cd tester
+		./tester.sh
 
 bonus		:			$(OBJS) $(OBJS_BONUS)
 				gcc -Wall -Wextra -o $(NAME) $(OBJS_BONUS) $(OBJS) $(CFLAGS)
