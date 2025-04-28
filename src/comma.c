@@ -38,6 +38,14 @@ int execute_main_cmd(char *cmd, minishel_t **llenv)
 
     cmd = process_expvar_backticks(cmd, llenv);
     args = my_str_to_word_array(cmd, is_space);
+    if (args && args[0]) {
+        char *var_value = check_variable(args[0], llenv);
+        if (var_value) {
+            // Replace command with the variable's value
+            my_free(args[0]);
+            args[0] = my_strdup(var_value);
+        }
+    }
     check_alias(&args);
     args = globbing(args);
     if (args == NULL)
