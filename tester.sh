@@ -19,7 +19,7 @@ print_header() {
     echo "   ██║   ██╔══╝  ╚════██║   ██║   ██╔══╝  ██╔══██╗    ╚════██║██╔═══╝ ╚════██║██╔══██║"
     echo "   ██║   ███████╗███████║   ██║   ███████╗██║  ██║         ██║███████╗███████║██║  ██║"
     echo "   ╚═╝   ╚══════╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝         ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝"
-    echo -e "${RESET}${YELLOW}${BOLD}                     You know the answer...${RESET}\n"
+    echo -e "${RESET}${YELLOW}${BOLD}       Simon PUCCIO, Jeremy ALBERTINI, Enzo BAZIN, Antony POLIAUTRE, Aryan BHOTEY${RESET}\n"
     echo -e "${CYAN}${BOLD}===========================================================================${RESET}"
     echo -e "${WHITE}${BOLD}Testing script for 42sh UNIX Shell${RESET}"
     echo -e "${CYAN}${BOLD}===========================================================================${RESET}\n"
@@ -28,6 +28,10 @@ print_header() {
 MYSHELL="$PWD/42sh"
 REFER="/bin/tcsh -f"
 TRAPSIG=0
+
+# Variables to track test progress
+TOTAL_TESTS=0
+PASSED_TESTS=0
 
 CAT=`which cat`
 GREP=`which grep`
@@ -111,8 +115,14 @@ load_test()
     i=`$EXPR $i + 1`
   done
 
+  # Increment total tests counter
+  TOTAL_TESTS=$((TOTAL_TESTS + 1))
+
   if [ $ok -eq 1 ]
   then
+    # Increment passed tests counter
+    PASSED_TESTS=$((PASSED_TESTS + 1))
+    
     if [ $debug -ge 1 ]
     then
       echo -e "Test $id ($NAME) : ${GREEN}${BOLD}OK${RESET}"
@@ -199,6 +209,22 @@ else
   fi
 fi
 
+# Calculate percentage of passed tests
+if [ $TOTAL_TESTS -eq 0 ]; then
+  PERCENTAGE=0
+else
+  PERCENTAGE=$(( (PASSED_TESTS * 100) / TOTAL_TESTS ))
+fi
+
+# Determine color based on percentage
+if [ $PERCENTAGE -ge 90 ]; then
+  COLOR="${GREEN}"
+elif [ $PERCENTAGE -ge 60 ]; then
+  COLOR="${YELLOW}"
+else
+  COLOR="${RED}"
+fi
+
 echo -e "\n${CYAN}${BOLD}===========================================================================${RESET}"
-echo -e "${WHITE}${BOLD}Tests completed${RESET}"
+echo -e "${WHITE}${BOLD}Tests completed: ${COLOR}${BOLD}$PASSED_TESTS/$TOTAL_TESTS tests passed (${PERCENTAGE}%)${RESET}"
 echo -e "${CYAN}${BOLD}===========================================================================${RESET}\n"
