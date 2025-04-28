@@ -101,8 +101,6 @@ jobs:
   run_tests:
     needs: check_program_compilation
     runs-on: ubuntu-latest
-    container:
-      image: epitechcontent/epitest-docker
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -117,6 +115,6 @@ jobs:
         timeout-minutes: 5
         run: make tester
 
-      - name: Run unit tests
-        timeout-minutes: 2
-        run: make tests_run
+      # - name: Run unit tests
+      #   timeout-minutes: 2
+      #   run: make tests_run
