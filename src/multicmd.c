@@ -66,7 +66,7 @@ static int handle_or_op(char *token, minishel_t **llenv)
     char *or_token = my_strstr(token, "||");
     char *or_copy;
     error_t *err = get_error();
-    
+
     if (or_token == NULL)
         return -1;
     or_copy = my_strdup(token);
@@ -89,7 +89,7 @@ static int handle_and_op(char *token, minishel_t **llenv)
     char *and_token = my_strstr(token, "&&");
     char *and_copy;
     error_t *err = get_error();
-    
+
     if (and_token == NULL)
         return -1;
     and_copy = my_strdup(token);
@@ -110,7 +110,8 @@ static int execute_simple_command(char *token, minishel_t **llenv)
 {
     int status = 0;
     const char *cmd[] = {"repeat", "which", "&", NULL};
-    int (*handlers[])(char *, minishel_t **) = {handle_repeat, handle_which, handle_background};
+    int (*handlers[])(char *, minishel_t **) =
+        {handle_repeat, handle_which, handle_background};
 
     for (int i = 0; cmd[i]; i++) {
         if (my_strstr(token, cmd[i]) != NULL) {
@@ -124,17 +125,17 @@ static int execute_simple_command(char *token, minishel_t **llenv)
 int handle_tok(char *token, minishel_t **llenv)
 {
     int status;
-    
+
     if (validate_cmd_syntax(token) != 0)
-        return 1;        
+        return 1;
     if (is_parentese(token))
-        return handle_parenthese(llenv, token);    
+        return handle_parenthese(llenv, token);
     status = handle_or_op(token, llenv);
     if (status != -1)
-        return status;    
+        return status;
     status = handle_and_op(token, llenv);
     if (status != -1)
-        return status;    
+        return status;
     return execute_simple_command(token, llenv);
 }
 

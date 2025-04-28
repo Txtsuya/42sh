@@ -107,8 +107,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Run tester
-        timeout-minutes: 2
+      - name: Compile using Makefile
+        run: make re
+      
+      - name: Set up tester permissions
+        run: chmod +x tester.sh
+      
+      - name: Run tester using Makefile
+        timeout-minutes: 5
         run: make tester
 
       - name: Run unit tests
