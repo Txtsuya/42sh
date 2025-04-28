@@ -1,0 +1,112 @@
+name: 42sh
+
+env:
+  EXECUTABLES: 42sh
+  MIRROR_URL: EpitechPGEPromo2029/B-PSU-200-NCE-2-1-42sh-simon.puccio.git
+
+on: [push, pull_request]
+
+jobs:
+  check-repository:
+    runs-on: ubuntu-latest
+    outputs:
+      should-run: ${{ steps.check.outputs.should-run }}
+    steps:
+      - name: check mirror
+        id: check
+        run: |
+          if [ "${{ github.repository }}" == "${{ env.MIRROR_URL }}" ]; then
+            echo "should-run=false" >> $GITHUB_OUTPUT
+          else
+            echo "should-run=true" >> $GITHUB_OUTPUT
+          fi
+
+  check_banned_functions:
+    needs: check-repository
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile
+        timeout-minutes: 2
+        run: make
+
+      - name: Check for banned functions
+        run: .github/workflows/check_banned_function 42sh -a .github/workflows/authorized_functions.txt
+
+  check_coding_style:
+    needs: check_banned_functions
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/epitech/coding-style-checker:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run coding style checker
+        run: check.sh $(pwd) $(pwd)
+      
+      - name: cstyle errors
+        if: always()
+        run: |
+          if [ -s coding-style-reports.log ]; then
+            cat coding-style-reports.log | while read line; do
+              file=$(echo $line | cut -d: -f1)
+              line_nb=$(echo $line | cut -d: -f2)
+              error=$(echo $line | cut -d: -f3-)
+              echo "::error file=$file,line=$line_nb::$error"
+            done
+            exit 1
+          fi
+
+  check_program_compilation:
+    needs: check_coding_style
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Compile
+        run: make re
+      
+      - name: Clean
+        run: make clean
+      
+      - name: Check exec
+        shell: bash
+        run: |
+          MISSING=0
+          IFS=',' read -ra EXEC_ARRAY <<< "${{ env.EXECUTABLES }}"
+          for exec in "${EXEC_ARRAY[@]}"; do
+            if [ ! -f "$exec" ]; then
+              echo "::error::Executable $exec does not exist"
+              MISSING=1
+            elif [ ! -x "$exec" ]; then
+              echo "::error::File $exec exists but is not executable"
+              MISSING=1
+            else
+              echo "Executable $exec exists and is executable"
+            fi
+          done
+          
+          if [ $MISSING -ne 0 ]; then
+            exit 1
+          fi
+
+  run_tests:
+    needs: check_program_compilation
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run tests
+        timeout-minutes: 2
+        run: make tests_run
