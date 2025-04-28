@@ -249,6 +249,7 @@ int validate_or(char *cmd);
 int validate_mixed(char *cmd);
 int validate_cmd_syntax(char *cmd);
 int process_token(char *token, minishel_t **llenv);
+int handle_tok(char *token, minishel_t **llenv);
 
 //builtins error
 error_t *get_error(void);
