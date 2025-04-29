@@ -21,7 +21,7 @@ static int error_command_not_found(char *path_cmd, char *args)
 
 static int execve_error(char *command, char **env)
 {
-    if (check_env_void(env)) {
+    if (check_env_void(env) || strcmp(my_get_env_char("PATH", env), "/") == 0) {
         my_putstr(command);
         my_putstr(": Command not found.\n");
         return 1;
