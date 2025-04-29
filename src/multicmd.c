@@ -122,23 +122,6 @@ static int execute_simple_command(char *token, minishel_t **llenv)
     return which_cmd(token, llenv);
 }
 
-int handle_tok(char *token, minishel_t **llenv)
-{
-    int status;
-
-    if (validate_cmd_syntax(token) != 0)
-        return 1;
-    if (is_parentese(token))
-        return handle_parenthese(llenv, token);
-    status = handle_or_op(token, llenv);
-    if (status != -1)
-        return status;
-    status = handle_and_op(token, llenv);
-    if (status != -1)
-        return status;
-    return execute_simple_command(token, llenv);
-}
-
 int execute_multi_cmd(minishel_t **llenv, char *input)
 {
     char **all_cmd = string_to_array_with_priority(input, is_separator);
