@@ -20,9 +20,12 @@ char *get_path_cmd(char *args, minishel_t **llenv)
 {
     char *path_cmd;
 
-    if (access(args, X_OK) != 0)
-        path_cmd = build_path_cmd(args, llenv);
-    else
+    if (check_is_exec(args)) {
+        if (access(args, X_OK) != 0)
+            return NULL;
         path_cmd = my_strdup(args);
+    } else {
+        path_cmd = build_path_cmd(args, llenv);
+    }
     return path_cmd;
 }
