@@ -129,14 +129,3 @@ int execute_command(char *path_cmd, char **args, minishel_t **llenv)
         return handle_parent_process(path_cmd, args, pid, env_array);
     }
 }
-
-char *get_path_cmd(char *args, minishel_t **llenv)
-{
-    char *path_cmd;
-
-    if (access(args, X_OK) != 0)
-        path_cmd = build_path_cmd(args, llenv);
-    else
-        path_cmd = my_strdup(args);
-    return path_cmd;
-}
