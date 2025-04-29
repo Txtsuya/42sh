@@ -29,7 +29,6 @@ MYSHELL="$PWD/42sh"
 REFER="/bin/tcsh -f"
 TRAPSIG=0
 
-# Variables to track test progress
 TOTAL_TESTS=0
 PASSED_TESTS=0
 
