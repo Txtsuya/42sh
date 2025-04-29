@@ -167,7 +167,6 @@ int seg_exit(int status);
 void free_array(char **tab);
 int len_array(char **array);
 char *get_path_cmd(char *args, minishel_t **llenv);
-int execute_multi_cmd(minishel_t **llenv, char *input);
 int execute_main_cmd(char *cmd, minishel_t **llenv);
 int executepipe(char *token, minishel_t **llenv);
 int nbr_instr(char *str, char c);
@@ -255,5 +254,13 @@ int handle_tok(char *token, minishel_t **llenv);
 error_t *get_error(void);
 char *my_get_env_char(char *name, char **env);
 int check_env_void(char **env);
+
+//multicmd handling
+int is_parentese(char *input);
+int handle_or_op(char *token, minishel_t **llenv);
+int handle_and_op(char *token, minishel_t **llenv);
+int execute_simple_command(char *token, minishel_t **llenv);
+int execute_multi_cmd(minishel_t **llenv, char *input);
+
 
 #endif

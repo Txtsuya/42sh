@@ -49,7 +49,7 @@ static void parse_token(char *token)
     }
 }
 
-static int is_parentese(char *input)
+int is_parentese(char *input)
 {
     int count = 0;
 
@@ -60,7 +60,7 @@ static int is_parentese(char *input)
     return 0;
 }
 
-static int handle_or_op(char *token, minishel_t **llenv)
+int handle_or_op(char *token, minishel_t **llenv)
 {
     int status;
     char *or_token = my_strstr(token, "||");
@@ -83,7 +83,7 @@ static int handle_or_op(char *token, minishel_t **llenv)
     return status;
 }
 
-static int handle_and_op(char *token, minishel_t **llenv)
+int handle_and_op(char *token, minishel_t **llenv)
 {
     int status;
     char *and_token = my_strstr(token, "&&");
@@ -106,7 +106,7 @@ static int handle_and_op(char *token, minishel_t **llenv)
     return status;
 }
 
-static int execute_simple_command(char *token, minishel_t **llenv)
+int execute_simple_command(char *token, minishel_t **llenv)
 {
     int status = 0;
     const char *cmd[] = {"repeat", "which", "&", NULL};
