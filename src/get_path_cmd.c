@@ -20,8 +20,6 @@ char *get_path_cmd(char *args, minishel_t **llenv)
 {
     char *path_cmd;
 
-    if (access(args, X_OK) == 0 && !check_is_exec(args))
-        return NULL;
     if (access(args, X_OK) != 0)
         path_cmd = build_path_cmd(args, llenv);
     else
