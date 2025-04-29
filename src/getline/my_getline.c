@@ -36,18 +36,22 @@ static void handle_input(char **input, int *lenght, int *cursor, char c)
 
 static void handle_del(int *cursor, char **input, int *lenght)
 {
-    char *old_text = my_malloc(sizeof(char) * (*lenght - 1));
-    char *previous = *input;
+    char *old_text;
+    char *previous;
     int k = 0;
 
     if (*lenght == 0 || *cursor == 0)
         return;
+    old_text = my_malloc(sizeof(char) * (*lenght));
+    if (!old_text)
+        return;
+    previous = *input;
     for (int i = 0; i < *lenght; i++) {
         old_text[k] = (*input)[i];
         if (i != *cursor - 1)
             k++;
     }
-    old_text[*lenght - 1] = '\0';
+    old_text[k] = '\0';
     *input = old_text;
     *lenght -= 1;
     *cursor -= 1;

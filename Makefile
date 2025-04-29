@@ -48,7 +48,7 @@ clean_test		:
 re              :               fclean all
 
 val		:
-			gcc -o $(NAME) $(SRCS) $(CFLAGS) -g3
+			gcc -o $(NAME) $(SRCS) $(CFLAGS) main.c -g3
 
 run 	:		re
 				./$(NAME)
