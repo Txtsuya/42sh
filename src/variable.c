@@ -42,7 +42,7 @@ static void print_var(void)
     }
 }
 
-char *concat_args(char **args, int len_args, int start)
+static char *concat_args(char **args, int start)
 {
     char *result = NULL;
     int size = 0;
@@ -59,6 +59,19 @@ char *concat_args(char **args, int len_args, int start)
     return result;
 }
 
+static char **prepare_cut_var(char **args, int *i, minishel_t **llenv)
+{
+    char **cut_var = my_str_to_word_array(args[*i], is_equal);
+    int len = len_array(cut_var);
+
+    if (len <= 1) {
+        args[*i] = concat_args(args, *i);
+        cut_var = my_str_to_word_array(args[*i], is_equal);
+        (*i) += 2;
+    }
+    return cut_var;
+}
+
 int handle_variable(char **args, minishel_t **llenv)
 {
     minishel_t **variable = get_variable();
@@ -70,14 +83,8 @@ int handle_variable(char **args, minishel_t **llenv)
         print_var();
     for (int i = 1; args[i]; i++) {
         args[i] = expand_variables(args[i], llenv);
-        cut_var = my_str_to_word_array(args[i], is_equal);
+        cut_var = prepare_cut_var(args, &i, llenv);
         len_cut = len_array(cut_var);
-        if (len_cut <= 1) {
-            args[i] = concat_args(args, strlen(args[i]), i);
-            cut_var = my_str_to_word_array(args[i], is_equal);
-            len_cut = len_array(cut_var);
-            i += 2;
-        }
         if (len_cut <= 1 || check_right_argv(cut_var[0]) == 1)
             continue;
         if (len_cut == 2)
