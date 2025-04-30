@@ -56,7 +56,6 @@ char *concat_args(char **args, int len_args, int start)
     for (int i = start; i <= start + 2 && args[i]; i++) {
         strcat(result, args[i]);
     }
-    printf("concat %s\n", result);
     return result;
 }
 
@@ -78,10 +77,7 @@ int handle_variable(char **args, minishel_t **llenv)
             cut_var = my_str_to_word_array(args[i], is_equal);
             len_cut = len_array(cut_var);
             i += 2;
-            printf("cut len %d\n", len_cut);
         }
-        for (int j = 0; cut_var[j]; j++)
-            printf("cut var %d %s\n", j, cut_var[j]);
         if (len_cut <= 1 || check_right_argv(cut_var[0]) == 1)
             continue;
         if (len_cut == 2)
