@@ -58,37 +58,25 @@ static void handle_del(int *cursor, char **input, int *lenght)
     my_free(previous);
 }
 
-static void handle_arrow(int *cursor, int *lenght)
-{
-    char c;
-    char d;
-
-    read(STDIN_FILENO, &c, 1);
-    read(STDIN_FILENO, &d, 1);
-    if (c != 91)
-        return;
-    if (d == 67) {
-        if (*cursor == *lenght)
-            return;
-        *cursor += 1;
-    }
-    if (d == 68) {
-        if (*cursor == 0)
-            return;
-        *cursor -= 1;
-    }
-}
-
 static int is_sp_input(char c, int *cursor, char **input, int *lenght)
 {
-    if (c == 27) {
-        handle_arrow(cursor, lenght);
+    if (c == 1) {
+        *cursor = 0;
         return 0;
-    } else if (c == 127 || c == 8) {
+    }
+    if (c == 5) {
+        *cursor = *lenght;
+        return 0;
+    }
+    if (c == 27) {
+        handle_arrow(cursor, lenght, input);
+        return 0;
+    }
+    if (c == 127 || c == 8) {
         handle_del(cursor, input, lenght);
         return 0;
-    } else
-        handle_input(input, lenght, cursor, c);
+    }
+    handle_input(input, lenght, cursor, c);
     return 0;
 }
 
