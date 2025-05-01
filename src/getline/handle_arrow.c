@@ -10,6 +10,13 @@
 void handle_up_arrow(int *cursor, int *lenght, char **input)
 {
     history_t *hty = *get_history();
+    char *newval = history_cmp(hty, *input, *cursor);
+    char *previous = *input;
+
+    if (newval == NULL)
+        return;
+    *input = newval;
+    *lenght = my_strlen(newval);
 }
 
 void handle_arrow(int *cursor, int *lenght, char **input)
@@ -25,4 +32,6 @@ void handle_arrow(int *cursor, int *lenght, char **input)
         *cursor += 1;
     if (d == 68 && *cursor != 0)
         *cursor -= 1;
+    if (d == 65)
+        handle_up_arrow(cursor, lenght, input);
 }

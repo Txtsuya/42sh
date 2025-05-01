@@ -59,6 +59,10 @@ char *history_neg(history_t *current, int n)
 
 char *history_cmp(history_t *current, char *line, int len)
 {
+    if (current == NULL)
+        return NULL;
+    if (len == 0)
+        return my_strdup(current->cmd);
     while (current) {
         if (strncmp(current->cmd, line, len) == 0)
             return my_strdup(current->cmd);

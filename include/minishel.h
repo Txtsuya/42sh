@@ -202,6 +202,8 @@ int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
 int my_getline(char **input, char *path);
+void handle_arrow(int *cursor, int *lenght, char **input);
+char *history_cmp(history_t *current, char *line, int len);
 int is_two_dote(char c);
 void print_prompt(minishel_t **llenv);
 
