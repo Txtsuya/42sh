@@ -81,7 +81,7 @@ int handle_variable(char **args, minishel_t **llenv)
 
     if (len_args == 1)
         print_var();
-    for (int i = 1; args[i]; i++) {
+    for (int i = 1; i < len_args; i++) {
         args[i] = expand_variables(args[i], llenv);
         cut_var = prepare_cut_var(args, &i, llenv);
         len_cut = len_array(cut_var);
