@@ -35,6 +35,9 @@ void add_history(char *args)
     new->hour = get_time();
     idx++;
     new->next = *head;
+    new->prev = NULL;
+    if (*head != NULL)
+        (*head)->prev = new;
     *head = new;
 }
 
