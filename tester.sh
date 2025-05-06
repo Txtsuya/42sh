@@ -1,8 +1,36 @@
 #!/bin/bash
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+print_header() {
+    clear
+    echo -e "${BLUE}${BOLD}"
+    echo "████████╗███████╗███████╗████████╗███████╗██████╗     ██╗  ██╗██████╗ ███████╗██╗  ██╗"
+    echo "╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ██║  ██║╚════██╗██╔════╝██║  ██║"
+    echo "   ██║   █████╗  ███████╗   ██║   █████╗  ██████╔╝    ███████║ █████╔╝███████╗███████║"
+    echo "   ██║   ██╔══╝  ╚════██║   ██║   ██╔══╝  ██╔══██╗    ╚════██║██╔═══╝ ╚════██║██╔══██║"
+    echo "   ██║   ███████╗███████║   ██║   ███████╗██║  ██║         ██║███████╗███████║██║  ██║"
+    echo "   ╚═╝   ╚══════╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝         ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝"
+    echo -e "${RESET}${YELLOW}${BOLD}       Simon PUCCIO, Jeremy ALBERTINI, Enzo BAZIN, Antony POLIAUTRE, Aryan BHOTEY${RESET}\n"
+    echo -e "${CYAN}${BOLD}===========================================================================${RESET}"
+    echo -e "${WHITE}${BOLD}Testing script for 42sh UNIX Shell${RESET}"
+    echo -e "${CYAN}${BOLD}===========================================================================${RESET}\n"
+}
+
 MYSHELL="$PWD/42sh"
 REFER="/bin/tcsh -f"
 TRAPSIG=0
+
+TOTAL_TESTS=0
+PASSED_TESTS=0
 
 CAT=`which cat`
 GREP=`which grep`
@@ -86,35 +114,41 @@ load_test()
     i=`$EXPR $i + 1`
   done
 
+  TOTAL_TESTS=$((TOTAL_TESTS + 1))
+
   if [ $ok -eq 1 ]
   then
+    PASSED_TESTS=$((PASSED_TESTS + 1))
+    
     if [ $debug -ge 1 ]
     then
-      echo "Test $id ($NAME) : OK"
+      echo -e "Test $id ($NAME) : ${GREEN}${BOLD}OK${RESET}"
       if [ $debug -eq 2 ]
       then
-        echo "Output $MYSHELL :"
+        echo -e "${YELLOW}Output $MYSHELL :${RESET}"
         $CAT -e /tmp/.shell.$$
         echo "" 
-        echo "Output $REFER :"
+        echo -e "${YELLOW}Output $REFER :${RESET}"
         $CAT -e /tmp/.refer.$$
         echo ""
       fi
     else
-      echo "OK"
+      echo -e "${GREEN}${BOLD}OK${RESET}"
     fi
   else
     if [ $debug -ge 1 ]
     then
-      echo "Test $id ($NAME) : KO - Check output in /tmp/test.$$/$id/" 
+      echo -e "Test $id ($NAME) : ${RED}${BOLD}KO${RESET} - Check output in /tmp/test.$$/$id/" 
       $MKDIR -p /tmp/test.$$/$id 2>/dev/null
       $CP /tmp/.shell.$$ /tmp/test.$$/$id/mysh.out
       $CP /tmp/.refer.$$ /tmp/test.$$/$id/tcsh.out
     else
-      echo "KO"
+      echo -e "${RED}${BOLD}KO${RESET}"
     fi
   fi
 }
+
+print_header
 
 if [ $TRAPSIG -eq 1 ]
 then
@@ -130,23 +164,25 @@ fi
 
 if [ ! -f tests ]
 then
-  echo "No tests file. Please read README.ME" >&2
+  echo -e "${RED}${BOLD}No tests file. Please read README.ME${RESET}" >&2
   exit 1
 fi
 
 if [ ! -f $MYSHELL ]
 then
-  echo "$MYSHELL not found" >&2
+  echo -e "${RED}${BOLD}$MYSHELL not found${RESET}" >&2
   exit 1
 fi
 
 if [ $# -eq 2 ]
 then
-  echo "Debug mode" >&2
-  echo "Shell : $MYSHELL" >&2
-  echo "Reference : $REFER" >&2
+  echo -e "${CYAN}Debug mode${RESET}" >&2
+  echo -e "${CYAN}Shell : $MYSHELL${RESET}" >&2
+  echo -e "${CYAN}Reference : $REFER${RESET}" >&2
   echo ""
 fi
+
+echo -e "${MAGENTA}${BOLD}Running tests...${RESET}\n"
 
 if [ $# -eq 0 ]
 then
@@ -169,3 +205,21 @@ else
     fi
   fi
 fi
+
+if [ $TOTAL_TESTS -eq 0 ]; then
+  PERCENTAGE=0
+else
+  PERCENTAGE=$(( (PASSED_TESTS * 100) / TOTAL_TESTS ))
+fi
+
+if [ $PERCENTAGE -ge 90 ]; then
+  COLOR="${GREEN}"
+elif [ $PERCENTAGE -ge 60 ]; then
+  COLOR="${YELLOW}"
+else
+  COLOR="${RED}"
+fi
+
+echo -e "\n${CYAN}${BOLD}===========================================================================${RESET}"
+echo -e "${WHITE}${BOLD}Tests completed: ${COLOR}${BOLD}$PASSED_TESTS/$TOTAL_TESTS tests passed (${PERCENTAGE}%)${RESET}"
+echo -e "${CYAN}${BOLD}===========================================================================${RESET}\n"

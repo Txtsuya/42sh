@@ -172,7 +172,6 @@ int seg_exit(int status);
 void free_array(char **tab);
 int len_array(char **array);
 char *get_path_cmd(char *args, minishel_t **llenv);
-int execute_multi_cmd(minishel_t **llenv, char *input);
 int execute_main_cmd(char *cmd, minishel_t **llenv);
 int executepipe(char *token, minishel_t **llenv);
 int nbr_instr(char *str, char c);
@@ -181,7 +180,7 @@ int parse_redirections(char **args);
 char **remove_redirections(char **args);
 int test_valid_pipe(char *token);
 int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
-int check_right_argv(char *argv);
+int check_right_argv(char *argv, char *func);
 int handle_alias(char **args, minishel_t **llenv);
 void check_alias(char ***args);
 char *extract_between_c(const char *str, char c);
@@ -207,6 +206,7 @@ void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
+int my_getline(char **input, char *path);
 int is_two_dote(char c);
 void print_prompt(minishel_t **llenv);
 
@@ -253,10 +253,19 @@ int validate_or(char *cmd);
 int validate_mixed(char *cmd);
 int validate_cmd_syntax(char *cmd);
 int process_token(char *token, minishel_t **llenv);
+int handle_tok(char *token, minishel_t **llenv);
 
 //builtins error
 error_t *get_error(void);
 char *my_get_env_char(char *name, char **env);
 int check_env_void(char **env);
+
+//multicmd handling
+int is_parentese(char *input);
+int handle_or_op(char *token, minishel_t **llenv);
+int handle_and_op(char *token, minishel_t **llenv);
+int execute_simple_command(char *token, minishel_t **llenv);
+int execute_multi_cmd(minishel_t **llenv, char *input);
+
 
 #endif

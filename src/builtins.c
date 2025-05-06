@@ -36,7 +36,7 @@ int my_setenv(char **args, minishel_t **llenv)
         print_env(*llenv);
         return 1;
     }
-    if (check_right_argv(args[1]) == 1)
+    if (check_right_argv(args[1], "setenv") == 1)
         return 1;
     if (len == 2) {
         add_llist(llenv, args[1], NULL);

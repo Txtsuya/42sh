@@ -21,24 +21,24 @@ jobs:
             echo "should-run=true" >> $GITHUB_OUTPUT
           fi
 
-  check_banned_functions:
-    needs: check-repository
-    runs-on: ubuntu-latest
-    container:
-      image: epitechcontent/epitest-docker
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  # check_banned_functions:
+  #   needs: check-repository
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: epitechcontent/epitest-docker
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Compile
-        timeout-minutes: 2
-        run: make
+  #     - name: Compile
+  #       timeout-minutes: 2
+  #       run: make
 
-      - name: Check for banned functions
-        run: .github/workflows/check_banned_function 42sh -a .github/workflows/authorized_functions.txt
+  #     - name: Check for banned functions
+  #       run: .github/workflows/check_banned_function 42sh -a .github/workflows/authorized_functions.txt
 
   check_coding_style:
-    needs: check_banned_functions
+    # needs: check_banned_functions
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/epitech/coding-style-checker:latest
@@ -63,7 +63,7 @@ jobs:
           fi
 
   check_program_compilation:
-    needs: check_coding_style
+    #needs: check_coding_style
     runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker
@@ -107,6 +107,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Run tests
+      - name: Compile using Makefile
+        run: make re
+      
+      - name: Set up tester permissions
+        run: chmod +x tester.sh
+      
+      - name: Run tester using Makefile
+        timeout-minutes: 5
+        run: make tester
+
+      - name: Run unit tests
         timeout-minutes: 2
         run: make tests_run

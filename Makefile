@@ -10,7 +10,8 @@ NAME	 	=		42sh
 SRCS		=		$(wildcard src/*.c) \
 					$(wildcard ./lib/my/*.c) $(wildcard ./lib/my_malloc/*.c) \
 					$(wildcard src/jobs_control/*.c) \
-					$(wildcard src/parentese_sys/*.c)
+					$(wildcard src/parentese_sys/*.c) \
+					$(wildcard src/getline/*.c)
 
 SRCS_BONUS	=		$(wildcard bonus/*.c)
 
@@ -47,7 +48,7 @@ clean_test		:
 re              :               fclean all
 
 val		:
-			gcc -o $(NAME) $(SRCS) $(CFLAGS) -g3
+			gcc -o $(NAME) $(SRCS) $(CFLAGS) main.c -g3
 
 run 	:		re
 				./$(NAME)
@@ -62,8 +63,7 @@ runvalcheck		:	val
 				valgrind --leak-check=full ./$(NAME)
 
 tester	:	re
-		cp $(NAME) ./tester
-		cd tester
+		./tester.sh
 
 bonus		:			$(OBJS) $(OBJS_BONUS)
 				gcc -Wall -Wextra -o $(NAME) $(OBJS_BONUS) $(OBJS) $(CFLAGS)
