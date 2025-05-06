@@ -85,7 +85,7 @@ int handle_variable(char **args, minishel_t **llenv)
         args[i] = expand_variables(args[i], llenv);
         cut_var = prepare_cut_var(args, &i, llenv);
         len_cut = len_array(cut_var);
-        if (check_right_argv(cut_var[0]) == 1)
+        if (check_right_argv(cut_var[0], "set") == 1)
             continue;
         if (len_cut == 2)
             add_llist(variable, cut_var[0], cut_var[1]);

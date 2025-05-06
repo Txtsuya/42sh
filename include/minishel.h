@@ -175,7 +175,7 @@ int parse_redirections(char **args);
 char **remove_redirections(char **args);
 int test_valid_pipe(char *token);
 int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
-int check_right_argv(char *argv);
+int check_right_argv(char *argv, char *func);
 int handle_alias(char **args, minishel_t **llenv);
 void check_alias(char ***args);
 char *extract_between_c(const char *str, char c);
