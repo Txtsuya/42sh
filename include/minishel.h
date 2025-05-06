@@ -106,6 +106,11 @@ typedef struct job_s {
     struct job_s *next;
 } job_t;
 
+typedef struct if_ctx_s {
+    int if_lvl;
+    char *buffer;
+} if_ctx_t;
+
 char **clean_quote(char **array);
 int is_level_0(level_ini_t *level);
 void update_level(level_ini_t *level, char *input, int i);
