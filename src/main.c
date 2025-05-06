@@ -67,4 +67,6 @@ void init_jobs(void)
     setpgid(0, 0);
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
 }
