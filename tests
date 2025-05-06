@@ -292,7 +292,7 @@ TESTS=
 NAME="Variables locales - nom invalide"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 TESTS=
-  echo 'set 123invalid=value'
+  echo 'set invalid@=value'
 [932-END]
 
 [940]
