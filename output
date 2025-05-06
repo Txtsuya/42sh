@@ -1,6 +1,5 @@
 42sh
 bonus
-coding-style-reports.log
 include
 lib
 main.c
@@ -9,7 +8,6 @@ output
 src
 test
 tester.sh
-tests
 testsaa
 tutu
 /home/aryan/delivery/S2/SHELL_PGRM/B-PSU-200-NCE-2-1-42sh-simon.puccio
