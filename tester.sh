@@ -114,12 +114,10 @@ load_test()
     i=`$EXPR $i + 1`
   done
 
-  # Increment total tests counter
   TOTAL_TESTS=$((TOTAL_TESTS + 1))
 
   if [ $ok -eq 1 ]
   then
-    # Increment passed tests counter
     PASSED_TESTS=$((PASSED_TESTS + 1))
     
     if [ $debug -ge 1 ]
@@ -208,14 +206,12 @@ else
   fi
 fi
 
-# Calculate percentage of passed tests
 if [ $TOTAL_TESTS -eq 0 ]; then
   PERCENTAGE=0
 else
   PERCENTAGE=$(( (PASSED_TESTS * 100) / TOTAL_TESTS ))
 fi
 
-# Determine color based on percentage
 if [ $PERCENTAGE -ge 90 ]; then
   COLOR="${GREEN}"
 elif [ $PERCENTAGE -ge 60 ]; then

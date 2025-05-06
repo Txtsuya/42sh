@@ -215,15 +215,15 @@ TESTS=
 NAME="*.c globbing"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 TESTS=
-  echo 'ls -l ../src/*.c'
+  echo 'ls -l src/*.c'
 [923-END]
 
 [924]
 NAME="*many globbing"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 TESTS=
-  echo 'ls -l ../src/*.c'
-  echo 'ls -l ../src/*e'
+  echo 'ls -l src/*.c'
+  echo 'ls -l src/*e'
   echo 'ls -l *e'
   echo 'ls *e'
   echo 'ls *e'
@@ -308,3 +308,151 @@ SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 TESTS=
   echo 'where cd ls echo false true'
 [941-END]
+
+[950]
+NAME="Inhibitors - Simple quoting"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'echo "Hello World"'
+echo 'echo "Escaped"'
+
+[950-END]
+
+[951]
+NAME="Inhibitors - Complex escaping"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'echo "Nested "quotes" and \\backslashes\\"'
+echo 'echo '''Single quoted $PATH''''
+
+[951-END]
+
+[952]
+NAME="Job Control - Background job"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'sleep 2 &'
+echo 'jobs'
+sleep 1
+
+[952-END]
+
+[954]
+NAME="Backticks - Simple substitution"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'echo "Date: date +%Y"'
+
+[954-END]
+
+[955]
+NAME="Backticks - Nested and pipes"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'echo "Files: ls *.c | wc -l; Hash: md5sum \ls | head -1``"'
+
+[955-END]
+
+[956]
+NAME="Parentheses - Command grouping"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo '(ls ; pwd) > output'
+echo 'cat output'
+
+[956-END]
+
+[957]
+NAME="Parentheses - Redirection in group"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN="rm output_combined"
+TESTS=
+echo '(ls /bin | grep "^a" ; ls /usr/bin | grep "^z") > output_combined'
+echo 'cat output_combined'
+
+[957-END]
+
+[958]
+NAME="Special Variables - $cwd"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'cd /tmp ; echo $cwd'
+
+[958-END]
+
+[959]
+NAME="Special Variables - cwdcmd hook"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'set cwdcmd="echo Directory changed to $cwd"'
+echo 'cd /tmp'
+
+[959-END]
+
+[960]
+NAME="History - Re-run last command"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'ls'
+echo '!!'
+
+[960-END]
+
+[961]
+NAME="History - Specific event number"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'ls'
+echo 'echo "First command"'
+echo '!-2'
+
+[961-END]
+
+[962]
+NAME="Aliases - Basic usage"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'alias lsa ls -a'
+echo 'lsa'
+
+[962-END]
+
+[963]
+NAME="Aliases - Chained commands"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'alias count "ls | wc -l"'
+echo 'alias search "grep main *.c"'
+echo 'count ; search'
+
+[963-END]
+
+[965]
+NAME="Scripting - Execute .sh file"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin' ; echo 'ls -l' > test_script.sh"
+CLEAN="rm test_script.sh"
+TESTS=
+echo './test_script.sh'
+
+[965-END]
+
+[966]
+NAME="Scripting - Variables and loops"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin' ; echo 'for i in 1 2 3; do echo $i; done' > loop.sh"
+CLEAN="rm loop.sh"
+TESTS=
+echo './loop.sh'
+
+[966-END]

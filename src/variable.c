@@ -42,6 +42,36 @@ static void print_var(void)
     }
 }
 
+static char *concat_args(char **args, int start)
+{
+    char *result = NULL;
+    int size = 0;
+
+    for (int i = start; i <= start + 2 && args[i]; i++)
+        size += strlen(args[i]);
+    result = my_malloc(sizeof(char) * (size + 1));
+    if (!result)
+        return NULL;
+    result[0] = '\0';
+    for (int i = start; i <= start + 2 && args[i]; i++) {
+        strcat(result, args[i]);
+    }
+    return result;
+}
+
+static char **prepare_cut_var(char **args, int *i, minishel_t **llenv)
+{
+    char **cut_var = my_str_to_word_array(args[*i], is_equal);
+    int len = len_array(cut_var);
+
+    if (len <= 1) {
+        args[*i] = concat_args(args, *i);
+        cut_var = my_str_to_word_array(args[*i], is_equal);
+        (*i) += 2;
+    }
+    return cut_var;
+}
+
 int handle_variable(char **args, minishel_t **llenv)
 {
     minishel_t **variable = get_variable();
@@ -51,11 +81,11 @@ int handle_variable(char **args, minishel_t **llenv)
 
     if (len_args == 1)
         print_var();
-    for (int i = 1; args[i]; i++) {
+    for (int i = 1; i < len_args; i++) {
         args[i] = expand_variables(args[i], llenv);
-        cut_var = my_str_to_word_array(args[i], is_equal);
+        cut_var = prepare_cut_var(args, &i, llenv);
         len_cut = len_array(cut_var);
-        if (check_right_argv(cut_var[0]) == 1)
+        if (check_right_argv(cut_var[0], "set") == 1)
             continue;
         if (len_cut == 2)
             add_llist(variable, cut_var[0], cut_var[1]);
