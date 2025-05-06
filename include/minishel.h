@@ -106,10 +106,10 @@ typedef struct job_s {
     struct job_s *next;
 } job_t;
 
-typedef struct if_ctx_s {
-    int if_lvl;
+typedef struct if_context {
+    int active;
     char *buffer;
-} if_ctx_t;
+} if_context_t;
 
 char **clean_quote(char **array);
 int is_level_0(level_ini_t *level);
@@ -243,6 +243,7 @@ int is_if_command(char *input);
 char *extract_then(char *str);
 char *extract_else(char *str);
 char *find_else(char *input);
+int handle_if_interactive_mode(minishel_t **llenv, int condition_result);
 
 //linux bc binary handling
 int bc_evaluation(char *condition);
