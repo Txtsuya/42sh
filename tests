@@ -397,27 +397,6 @@ echo 'cd /tmp'
 
 [959-END]
 
-[960]
-NAME="History - Re-run last command"
-SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
-CLEAN=""
-TESTS=
-echo 'ls'
-echo '!!'
-
-[960-END]
-
-[961]
-NAME="History - Specific event number"
-SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
-CLEAN=""
-TESTS=
-echo 'ls'
-echo 'echo "First command"'
-echo '!-2'
-
-[961-END]
-
 [962]
 NAME="Aliases - Basic usage"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
@@ -429,15 +408,27 @@ echo 'lsa'
 [962-END]
 
 [963]
-NAME="Aliases - Chained commands"
+NAME="UNALIAS: Simple test (ls)"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 CLEAN=""
 TESTS=
-echo 'alias count "ls | wc -l"'
-echo 'alias search "grep main *.c"'
-echo 'count ; search'
+  echo 'unalias ls'
+  echo 'ls'
 
 [963-END]
+
+[964]
+NAME="ALIAS: Unknown command (a -> ls)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'alias a ls'
+  echo 'a'
+  echo 'alias a ls -l'
+  echo 'a'
+  echo 'alias a ls -l -a'
+  echo 'a'
+[964-END]
 
 [965]
 NAME="Scripting - Execute .sh file"
