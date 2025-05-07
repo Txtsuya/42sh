@@ -33,12 +33,11 @@ fclean          :               clean
 				rm -f $(NAME)
 
 unit_tests      :               fclean all
-				gcc -o unit_tests $(SRCS) tests/*.c \
+				gcc -o unit_tests ./lib/my/*.c ./lib/my_malloc/*.c tests/*.c \
 				--coverage -lcriterion -I./include
 
 tests_run       :		unit_tests
 				./unit_tests
-				make clean_test
 
 clean_test		:
 				rm -rf unit_tests
