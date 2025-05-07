@@ -39,11 +39,9 @@ int has_then_keyword(char *input)
     return (strcmp(closing_paren, "then") == 0);
 }
 
-int handle_if(char *input, minishel_t **llenv)
+static int parse_and_eval_if_condition(char *input, int *result)
 {
     char *condition = NULL;
-    int result = 0;
-    char *cmd_after_if = NULL;
 
     input += 2;
     while (*input && isspace(*input))
@@ -53,8 +51,15 @@ int handle_if(char *input, minishel_t **llenv)
         printf("if: Expression Syntax.\n");
         return 1;
     }
-    result = bc_evaluation(condition);
+    *result = bc_evaluation(condition);
     my_free(condition);
+    return 0;
+}
+
+static int handle_if_exec(char *input, minishel_t **llenv, int result)
+{
+    char *cmd_after_if = NULL;
+
     if (has_then_keyword(input))
         return handle_if_interactive_mode(llenv, result);
     if (result) {
@@ -70,4 +75,13 @@ int handle_if(char *input, minishel_t **llenv)
             return execute_multi_cmd(llenv, cmd_after_if);
     }
     return 0;
+}
+
+int handle_if(char *input, minishel_t **llenv)
+{
+    int result = 0;
+
+    if (parse_and_eval_if_condition(input, &result))
+        return 1;
+    return handle_if_exec(input, llenv, result);
 }
