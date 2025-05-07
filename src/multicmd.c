@@ -83,6 +83,9 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
 
     if (strncmp(input, "if ", 3) == 0 || strncmp(input, "if(", 3) == 0)
         return handle_if(input, llenv);
+    if (strncmp(input, "foreach ", 8) == 0 ||
+        strncmp(input, "foreach(", 8) == 0)
+        return 0;
     if (validate_cmd_syntax(input) != 0)
         return 1;
     for (int i = 0; all_cmd[i] != NULL; i++)
