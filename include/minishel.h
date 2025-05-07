@@ -38,7 +38,14 @@ typedef struct history {
     int idx;
     char *hour;
     struct history *next;
+    struct history *prev;
 } history_t;
+
+typedef struct {
+    history_t *marked;
+    int type;
+    int cursor;
+} marked_hisory_t;
 
 typedef struct minishel_s {
     char *name;
@@ -201,9 +208,15 @@ void checklen(const char *str, int i, int *len, int *space);
 int get_len_exclamation(char *line);
 char *get_value_in_history(char *line, int len);
 history_t **get_history(void);
-int my_getline(char **input, char *path);
+int my_getline(char **input, minishel_t **llenv);
+void handle_arrow(int *cursor, int *lenght, char **input);
+char *history_cmp(history_t *current, char *line, int len);
 int is_two_dote(char c);
 void print_prompt(minishel_t **llenv);
+void clean_marked(int type);
+marked_hisory_t *get_marked_history(void);
+history_t *get_last_history(char *line, int sens, int is_first);
+void handle_up_arrow(int *cursor, int *lenght, char **input);
 
 //built-in handling
 int check_is_builtin(char *type);
