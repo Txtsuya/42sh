@@ -24,10 +24,11 @@ int valid_name(char *name)
     return 1;
 }
 
-int check_right_argv(char *argv)
+int check_right_argv(char *argv, char *func)
 {
     if (!valid_name(argv)) {
-        my_putstr("setenv: Variable name must "
+        my_putstr(func);
+        my_putstr(": Variable name must "
             "contain alphanumeric characters.\n");
         return 1;
     }

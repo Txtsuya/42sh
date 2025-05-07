@@ -113,6 +113,11 @@ typedef struct job_s {
     struct job_s *next;
 } job_t;
 
+typedef struct if_context {
+    int active;
+    char *buffer;
+} if_context_t;
+
 char **clean_quote(char **array);
 int is_level_0(level_ini_t *level);
 void update_level(level_ini_t *level, char *input, int i);
@@ -182,7 +187,7 @@ int parse_redirections(char **args);
 char **remove_redirections(char **args);
 int test_valid_pipe(char *token);
 int execute_pipeline(char *commands, int nbr_cmd, minishel_t **env);
-int check_right_argv(char *argv);
+int check_right_argv(char *argv, char *func);
 int handle_alias(char **args, minishel_t **llenv);
 void check_alias(char ***args);
 char *extract_between_c(const char *str, char c);
@@ -251,6 +256,7 @@ int is_if_command(char *input);
 char *extract_then(char *str);
 char *extract_else(char *str);
 char *find_else(char *input);
+int handle_if_interactive_mode(minishel_t **llenv, int condition_result);
 
 //linux bc binary handling
 int bc_evaluation(char *condition);

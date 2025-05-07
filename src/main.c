@@ -12,7 +12,7 @@ int replace_in_list(minishel_t **head, char const *name, char *value)
 
     while (tmp != NULL) {
         if (my_strcmp(name, tmp->name) == 0) {
-            tmp->value = my_strdup(value);
+            tmp->value = value ? my_strdup(value) : NULL;
             return 1;
         }
         tmp = tmp->next;
@@ -67,4 +67,6 @@ void init_jobs(void)
     setpgid(0, 0);
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
 }

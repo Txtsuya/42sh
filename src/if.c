@@ -2,22 +2,17 @@
 ** EPITECH PROJECT, 2025
 ** B-PSU-200-NCE-2-1-42sh-simon.puccio
 ** File description:
-** if
+** if - version modifiée
 */
 
 #include "minishel.h"
-
-int is_if_command(char *input)
-{
-    return (strncmp(input, "if ", 3) == 0 || strncmp(input, "if(", 3) == 0);
-}
 
 char *extract_condition(char *str)
 {
     char *start = strchr(str, '(');
     char *end = strchr(str, ')');
-    int len;
-    char *condition;
+    int len = 0;
+    char *condition = NULL;
 
     if (!start || !end || end <= start)
         return NULL;
@@ -32,34 +27,23 @@ char *extract_condition(char *str)
     return condition;
 }
 
-int evaluate_condition(char *condition)
+int has_then_keyword(char *input)
 {
-    return bc_evaluation(condition);
-}
+    char *closing_paren = strchr(input, ')');
 
-int exec_cmd_after_parenthesis(int result, minishel_t **llenv, char *input)
-{
-    if (result) {
-        input = strchr(input, ')');
-        if (!input) {
-            printf("Too many )'s.");
-            return 1;
-        }
-        input++;
-        while (*input && isspace(*input))
-            input++;
-        if (*input)
-            return execute_multi_cmd(llenv, input);
-    }
-    return 0;
+    if (!closing_paren)
+        return 0;
+    closing_paren++;
+    while (*closing_paren && isspace(*closing_paren))
+        closing_paren++;
+    return (strcmp(closing_paren, "then") == 0);
 }
 
 int handle_if(char *input, minishel_t **llenv)
 {
-    char *condition;
-    int result;
-    char *then_part;
-    char *command;
+    char *condition = NULL;
+    int result = 0;
+    char *cmd_after_if = NULL;
 
     input += 2;
     while (*input && isspace(*input))
@@ -69,9 +53,21 @@ int handle_if(char *input, minishel_t **llenv)
         printf("if: Expression Syntax.\n");
         return 1;
     }
-    result = evaluate_condition(condition);
+    result = bc_evaluation(condition);
     my_free(condition);
-    if (exec_cmd_after_parenthesis(result, llenv, input) == 1)
-        return 1;
+    if (has_then_keyword(input))
+        return handle_if_interactive_mode(llenv, result);
+    if (result) {
+        cmd_after_if = strchr(input, ')');
+        if (!cmd_after_if) {
+            printf("Too many )'s.\n");
+            return 1;
+        }
+        cmd_after_if++;
+        while (*cmd_after_if && isspace(*cmd_after_if))
+            cmd_after_if++;
+        if (*cmd_after_if)
+            return execute_multi_cmd(llenv, cmd_after_if);
+    }
     return 0;
 }
