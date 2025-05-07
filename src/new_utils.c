@@ -20,7 +20,7 @@ static int check_valide_output(char *line)
 int process_ignoreeof(char **input, size_t len, int ret_status,
     minishel_t **env)
 {
-    if (getline(input, &len, stdin) == -1) {
+    if (my_getline(input, env) == -1) {
         if (handle_ignoreeof(input, env) == 0)
             return 1;
         exit(ret_status);
@@ -47,6 +47,7 @@ int get_input(char **input, int ret_status, minishel_t **llenv)
     if (handle_exclamation(input))
         printf("%s\n", *input);
     add_history(*input);
+    clean_marked(0);
     return 0;
 }
 

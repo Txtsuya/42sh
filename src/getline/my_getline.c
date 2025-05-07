@@ -32,6 +32,7 @@ static void handle_input(char **input, int *lenght, int *cursor, char c)
     *lenght += 1;
     *cursor += 1;
     my_free(previous);
+    get_marked_history()->cursor = *cursor;
 }
 
 static void handle_del(int *cursor, char **input, int *lenght)
@@ -58,45 +59,51 @@ static void handle_del(int *cursor, char **input, int *lenght)
     my_free(previous);
 }
 
-static void handle_arrow(int *cursor, int *lenght)
+static int handle_ctrl_a(int *cursor, int *lenght)
 {
-    char c;
-    char d;
+    *cursor = 0;
+    get_marked_history()->cursor = *cursor;
+    return 0;
+}
 
-    read(STDIN_FILENO, &c, 1);
-    read(STDIN_FILENO, &d, 1);
-    if (c != 91)
-        return;
-    if (d == 67) {
-        if (*cursor == *lenght)
-            return;
-        *cursor += 1;
-    }
-    if (d == 68) {
-        if (*cursor == 0)
-            return;
-        *cursor -= 1;
-    }
+static int handle_ctrl_e(int *cursor, int *lenght)
+{
+    *cursor = *lenght;
+    get_marked_history()->cursor = *cursor;
+    return 0;
+}
+
+static int handle_backspace(int *cursor, char **input, int *lenght)
+{
+    handle_del(cursor, input, lenght);
+    get_marked_history()->cursor = *cursor;
+    return 0;
 }
 
 static int is_sp_input(char c, int *cursor, char **input, int *lenght)
 {
     if (c == 27) {
-        handle_arrow(cursor, lenght);
+        handle_arrow(cursor, lenght, input);
         return 0;
-    } else if (c == 127 || c == 8) {
-        handle_del(cursor, input, lenght);
-        return 0;
-    } else
-        handle_input(input, lenght, cursor, c);
+    }
+    if (c == 1) {
+        return handle_ctrl_a(cursor, lenght);
+    }
+    if (c == 5) {
+        return handle_ctrl_e(cursor, lenght);
+    }
+    if (c == 127 || c == 8) {
+        return handle_backspace(cursor, input, lenght);
+    }
+    handle_input(input, lenght, cursor, c);
     return 0;
 }
 
-static void print_the_input(char **input, int *lenght, int *cursor, char *path)
+static void print_the_input(char **input, int *lenght, int *cursor,
+    minishel_t **llenv)
 {
     write(1, "\033[2K\r", 5);
-    my_putstr(path);
-    my_putstr(" > ");
+    print_prompt(llenv);
     my_putstr(*input);
     write(1, " \b", 2);
     for (int i = 0; i < *lenght - *cursor; i++) {
@@ -104,7 +111,7 @@ static void print_the_input(char **input, int *lenght, int *cursor, char *path)
     }
 }
 
-int loop(char **input, char *path)
+int loop(char **input, minishel_t **llenv)
 {
     int lenght = 0;
     int cursor = 0;
@@ -121,12 +128,12 @@ int loop(char **input, char *path)
             break;
         if (is_sp_input(c, &cursor, input, &lenght))
             continue;
-        print_the_input(input, &lenght, &cursor, path);
+        print_the_input(input, &lenght, &cursor, llenv);
     }
     return 0;
 }
 
-int my_getline(char **input, char *path)
+int my_getline(char **input, minishel_t **llenv)
 {
     struct termios signal;
     int return_value = 0;
@@ -135,7 +142,7 @@ int my_getline(char **input, char *path)
     if (!isatty(STDIN_FILENO))
         return getline(input, &len, stdin);
     set_input_mode(&signal);
-    return_value = loop(input, path);
+    return_value = loop(input, llenv);
     tcsetattr(STDIN_FILENO, TCSANOW, &signal);
     write(STDOUT_FILENO, "\n", 1);
     return return_value;
