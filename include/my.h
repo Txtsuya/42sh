@@ -49,5 +49,6 @@ int my_strlen_c(char const *str, char c);
 int my_strcspn(const char *str, const char *reject);
 int get_redirection_index(const char *arg);
 int redir_heredoc(char *delimiter);
+char *my_strchr(const char *str, int c);
 
 #endif  /* MY_H */

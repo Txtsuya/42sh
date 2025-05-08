@@ -53,7 +53,7 @@ done
 disp_test()
 {
   id=$1
-  $CAT tests | $GREP -A1000 "\[$id\]" | $GREP -B1000 "^\[$id-END\]" | $GREP -v "^\[.*\]"
+  $CAT test | $GREP -A1000 "\[$id\]" | $GREP -B1000 "^\[$id-END\]" | $GREP -v "^\[.*\]"
 }
 
 run_script()
@@ -162,7 +162,7 @@ then
   done
 fi
 
-if [ ! -f tests ]
+if [ ! -f test ]
 then
   echo -e "${RED}${BOLD}No tests file. Please read README.ME${RESET}" >&2
   exit 1
@@ -186,7 +186,7 @@ echo -e "${MAGENTA}${BOLD}Running tests...${RESET}\n"
 
 if [ $# -eq 0 ]
 then
-  for lst in `cat tests | grep "^\[.*\]$" | grep -vi end | sed s/'\['// | sed s/'\]'//`
+  for lst in `cat test | grep "^\[.*\]$" | grep -vi end | sed s/'\['// | sed s/'\]'//`
   do
     path_backup=$PATH
     load_test $lst 1
