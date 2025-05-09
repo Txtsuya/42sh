@@ -1,5 +1,0 @@
-if (0) then
-   echo "tru"
-else
-    echo "cc"
-endif
