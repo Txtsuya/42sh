@@ -82,7 +82,7 @@ int execute_multi_cmd(minishel_t **llenv, char *input)
     int status = 0;
 
     if (strncmp(input, "if ", 3) == 0 || strncmp(input, "if(", 3) == 0)
-        return handle_if(input, llenv);
+        return 0;
     if (strncmp(input, "foreach ", 8) == 0 ||
         strncmp(input, "foreach(", 8) == 0)
         return 0;
