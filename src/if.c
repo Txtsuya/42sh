@@ -81,7 +81,10 @@ int handle_if(char *input, minishel_t **llenv)
 {
     int result = 0;
 
-    if (parse_and_eval_if_condition(input, &result))
-        return 1;
-    return handle_if_exec(input, llenv, result);
+    if (access("/usr/bin/bc", X_OK) == 0) {
+        if (parse_and_eval_if_condition(input, &result))
+            return 1;
+        return handle_if_exec(input, llenv, result);
+    }
+    return 0;
 }
