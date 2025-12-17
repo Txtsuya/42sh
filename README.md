@@ -112,7 +112,7 @@ make tests_run
 | if                               |     0%     |     0/2      |
 | repeat                           |    100%    |     1/1      |
 | parenthesis                      |     0%     |     0/1      |
-| **Overall Results**              | **91.7%**  |  **67/72**   |
+| **Overall Results**              | **91.7%**  |  **65/72**   |
 
 ### 📚 Keynote result
 We got the **best 42sh** of **our class**.
