@@ -266,4 +266,4 @@ Hello
 - [Enzo](https://github.com/enzo-bazin)
 - [Antony](https://github.com/antothP)
 - [Simon](https://github.com/Simon-du06)
-- [Jérémy](https://github.com/JeremyAlbertini)
+- [Jeremy](https://github.com/JeremyAlbertini)
